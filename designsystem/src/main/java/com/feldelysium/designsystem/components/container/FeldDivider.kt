@@ -26,16 +26,18 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.feldelysium.designsystem.foundation.material.agsl.INK_AGSL
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
+import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 import kotlin.random.Random
 
+/** A rough hand-torn divider line, horizontal or vertical. */
 @Composable
 public fun FeldDivider(
     modifier: Modifier = Modifier,
     seed: Int = rememberSeed(),
     vertical: Boolean = false,
     thickness: Dp = 1.dp,
-    color: Color = Color(0xFF666866),
+    color: Color = FeldPalette.Line,
     segment: Dp = 120.dp,
     changeChance: Float = 0.35f,
 ) {

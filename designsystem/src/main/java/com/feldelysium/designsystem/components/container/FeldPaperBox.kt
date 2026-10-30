@@ -11,6 +11,7 @@ import com.feldelysium.designsystem.foundation.material.paperSurface
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
 import com.feldelysium.designsystem.foundation.shape.RoughStyle
 
+/** A box with a paper surface and no decals. */
 @Composable
 public fun FeldPaperBox(
     modifier: Modifier = Modifier,

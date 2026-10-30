@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.feldelysium.designsystem.components.content.FeldDiamond
+import com.feldelysium.designsystem.components.content.FlatDiamond
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
 import com.feldelysium.designsystem.foundation.shape.RoughStyle
 import com.feldelysium.designsystem.theme.FeldPalette
@@ -51,7 +51,7 @@ internal fun FeldToast(
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            FeldDiamond(accent, size = 12.dp)
+            FlatDiamond(accent, size = 12.dp)
             Spacer(Modifier.width(12.dp))
             Text(
                 text = text,
@@ -90,6 +90,7 @@ public class FeldToastState {
 @Composable
 public fun rememberFeldToastState(): FeldToastState = remember { FeldToastState() }
 
+/** Shows one toast at the bottom of the screen; driven with [rememberFeldToastState]. */
 @Composable
 public fun FeldToastHost(state: FeldToastState, modifier: Modifier = Modifier) {
     val message = state.current

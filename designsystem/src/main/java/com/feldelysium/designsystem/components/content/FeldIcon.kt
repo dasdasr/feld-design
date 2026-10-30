@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +31,7 @@ import com.feldelysium.designsystem.components.container.FeldDivider
 import com.feldelysium.designsystem.foundation.material.FeldMarker
 import com.feldelysium.designsystem.foundation.material.MarkerFilmSpec
 import com.feldelysium.designsystem.foundation.material.markerFilmMaterial
+import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 
 public enum class FeldIconId {
@@ -81,6 +83,7 @@ public enum class FeldIconId {
     RadioButtonUnchecked,
 }
 
+/** Draws a [FeldIconId] icon, by default on a chalk film. */
 @Composable
 public fun FeldIcon(
     id: FeldIconId,
@@ -133,8 +136,8 @@ public fun FeldIcon(
         FeldIconId.Search -> R.drawable.feld_ic_search
         FeldIconId.Casino -> R.drawable.feld_ic_dice_5
         FeldIconId.Oprions -> R.drawable.feld_ic_options
-        FeldIconId.RadioButtonChecked -> R.drawable.feld_ic_radio_button_cheked
-        FeldIconId.RadioButtonUnchecked -> R.drawable.feld_ic_radio_button_uncheked
+        FeldIconId.RadioButtonChecked -> R.drawable.feld_ic_radio_button_checked
+        FeldIconId.RadioButtonUnchecked -> R.drawable.feld_ic_radio_button_unchecked
         FeldIconId.Reals -> R.drawable.feld_ic_real
         FeldIconId.Calendar -> R.drawable.feld_ic_calendar
         FeldIconId.Time -> R.drawable.feld_ic_time
@@ -161,7 +164,7 @@ public fun FeldIcon(
 }
 
 @Composable
-internal fun FeldDiamond(color: Color, modifier: Modifier = Modifier, size: Dp = 28.dp, outline: Boolean = false) {
+internal fun FlatDiamond(color: Color, modifier: Modifier = Modifier, size: Dp = 28.dp, outline: Boolean = false) {
     Canvas(modifier.size(size)) {
         val w = this.size.width
         val h = this.size.height
@@ -187,7 +190,7 @@ internal fun FeldDiamond(color: Color, modifier: Modifier = Modifier, size: Dp =
     backgroundColor = 0xFF0B1011,
 )
 @Composable
-private fun FeldIconPreview() {
+private fun FlatIconPreview() {
     FeldTheme {
         val icons = FeldIconId.entries
 
@@ -226,7 +229,7 @@ private fun FeldIconPreview() {
                 horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                FeldDiamond(
+                FlatDiamond(
                     color = Color.White,
                     size = 28.dp,
                 )
@@ -238,7 +241,7 @@ private fun FeldIconPreview() {
                     changeChance = 0.6f,
                 )
 
-                FeldDiamond(
+                FlatDiamond(
                     color = Color.White,
                     size = 28.dp,
                     outline = true,

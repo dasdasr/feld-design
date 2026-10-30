@@ -41,6 +41,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
@@ -82,6 +83,7 @@ import com.feldelysium.designsystem.foundation.material.wornBrush
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
 import com.feldelysium.designsystem.foundation.shape.RoughShape
 import com.feldelysium.designsystem.foundation.shape.RoughStyle
+import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -107,7 +109,7 @@ private val EntryRough = RoughStyle(
     jerkChance = 0.04f,
 )
 
-public fun entryRough(seed: Int): RoughStyle {
+internal fun noteRough(seed: Int): RoughStyle {
     val r = Random(seed * 31 + 7)
     return EntryRough.copy(
         corner = (2f + r.nextFloat() * 4f).dp,
@@ -137,14 +139,15 @@ private fun cachedDiamondBrush(color: Color, seed: Int, density: Float): Brush {
         ?: wornBrush(color, seed + 1, density, wear = 0.4f, scale = 10f).also { diamondBrushCache.put(key, it) }
 }
 
+/** A draggable note card with a colored accent, title, text and optional index; supports selection and swipe-to-delete. */
 @Composable
-public fun FeldEntryCard(
-    speakerName: String,
-    speakerColor: Color,
+public fun FeldNoteCard(
+    title: String,
+    accent: Color,
     text: String,
     modifier: Modifier = Modifier,
-    decalSpec: DecalSpec = DecalSpec.Entry,
-    number: Int? = null,
+    decalSpec: DecalSpec = DecalSpec.Note,
+    index: Int? = null,
     ambient: Float? = null,
     textured: Boolean = true,
     showDecals: Boolean = textured,
@@ -169,6 +172,9 @@ public fun FeldEntryCard(
         label = "lift",
     )
 
+    val currentDelete by rememberUpdatedState(onSwipeDelete)
+    val currentSwipeArmed by rememberUpdatedState(onSwipeArmed)
+
     var holding by remember { mutableStateOf(false) }
     val charging = holding && !isDragging
     val hold by animateFloatAsState(
@@ -190,17 +196,17 @@ public fun FeldEntryCard(
     } else {
         null
     }
-    val diamondBrush: Brush = remember(speakerColor, seed, density) {
-        cachedDiamondBrush(speakerColor, seed, density)
+    val diamondBrush: Brush = remember(accent, seed, density) {
+        cachedDiamondBrush(accent, seed, density)
     }
-    val barBrush: Brush = remember(speakerColor, seed, density, worn) {
+    val barBrush: Brush = remember(accent, seed, density, worn) {
         if (worn) {
-            wornBrush(speakerColor, seed, density, wear = 0.6f, scale = 7f)
+            wornBrush(accent, seed, density, wear = 0.6f, scale = 7f)
         } else {
-            SolidColor(speakerColor)
+            SolidColor(accent)
         }
     }
-    val flatBrush = remember(speakerColor) { SolidColor(speakerColor) }
+    val flatBrush = remember(accent) { SolidColor(accent) }
 
     val sway = remember { SwayState() }
     LaunchedEffect(isDragging) {
@@ -221,8 +227,8 @@ public fun FeldEntryCard(
             val fresh = isDragging && now - sway.velocityStamp < SWAY_VELOCITY_TTL_NANOS
             val velocity = if (fresh) sway.velocityY else 0f
             val torque = -SWAY_STIFFNESS * sway.angle -
-                SWAY_DAMPING * angularVelocity +
-                SWAY_GAIN * velocity * sway.dir
+                    SWAY_DAMPING * angularVelocity +
+                    SWAY_GAIN * velocity * sway.dir
 
             angularVelocity += torque * dt
             sway.angle = (sway.angle + angularVelocity * dt)
@@ -230,12 +236,12 @@ public fun FeldEntryCard(
         }
         sway.angle = 0f
     }
-    val rough = remember(seed) { entryRough(seed) }
+    val rough = remember(seed) { noteRough(seed) }
     val cardShape = remember(seed, rough) { RoughShape(seed = seed, style = rough) }
 
     val baseCtx = LocalFeldDecalContext.current
-    val decalCtx = remember(baseCtx, number, speakerName) {
-        baseCtx.copy(lineNumber = number, speakerName = speakerName)
+    val decalCtx = remember(baseCtx, index, title) {
+        baseCtx.copy(index = index, title = title)
     }
 
     val swiping by remember { derivedStateOf { swipe.value > 0.5f } }
@@ -284,7 +290,9 @@ public fun FeldEntryCard(
             }
             .pointerInput(onSwipeDelete != null, isDragging) {
                 if (onSwipeDelete == null || isDragging) return@pointerInput
+
                 var armed = false
+
                 detectHorizontalDragGestures(
                     onDragStart = { armed = false },
                     onDragEnd = {
@@ -292,20 +300,33 @@ public fun FeldEntryCard(
                         if (swipe.value / width >= SWIPE_DELETE_THRESHOLD) {
                             scope.launch {
                                 swipe.animateTo(width, tween(120))
-                                onSwipeDelete()
+                                currentDelete?.invoke()
                             }
                         } else {
-                            scope.launch { swipe.animateTo(0f, tween(200)) }
+                            scope.launch {
+                                swipe.animateTo(0f, tween(200))
+                            }
                         }
                     },
-                    onDragCancel = { scope.launch { swipe.animateTo(0f, tween(200)) } },
+                    onDragCancel = {
+                        scope.launch {
+                            swipe.animateTo(0f, tween(200))
+                        }
+                    },
                     onHorizontalDrag = { change, dragAmount ->
                         change.consume()
+
                         val next = (swipe.value + dragAmount).coerceIn(0f, sway.width)
                         val nowArmed = next / sway.width >= SWIPE_DELETE_THRESHOLD
-                        if (nowArmed && !armed) onSwipeArmed()
+
+                        if (nowArmed && !armed) {
+                            currentSwipeArmed()
+                        }
+
                         armed = nowArmed
-                        scope.launch { swipe.snapTo(next) }
+                        scope.launch {
+                            swipe.snapTo(next)
+                        }
                     },
                 )
             }
@@ -316,7 +337,7 @@ public fun FeldEntryCard(
         decalSpec = decalSpec,
         decalContext = decalCtx,
         decalInset = 7.dp,
-        spec = FeldPaper.Entry,
+        spec = FeldPaper.Note,
         rough = rough,
         contentPadding = PaddingValues(0.dp),
         onClick = onClick,
@@ -353,14 +374,14 @@ public fun FeldEntryCard(
                             .drawBehind { drawDiamondBeat(diamondBrush, hold, pulse?.value) },
                         contentAlignment = Alignment.Center,
                     ) {
-                        FeldHandDiamond(
-                            speakerColor,
-                            seed,
+                        HandDiamond(
+                            accent,
                             modifier = Modifier.graphicsLayer {
                                 val s = beatScale(pulse?.value)
                                 scaleX = s
                                 scaleY = s
                             },
+                            seed = seed,
                             size = 22.dp,
                             brush = diamondBrush,
                         )
@@ -369,9 +390,9 @@ public fun FeldEntryCard(
 
                     Column(Modifier.weight(1f)) {
                         Text(
-                            text = speakerName.uppercase(),
+                            text = title.uppercase(),
                             style = MaterialTheme.typography.labelMedium,
-                            color = speakerColor,
+                            color = accent,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -388,9 +409,9 @@ public fun FeldEntryCard(
                 }
             }
 
-            if (number != null) {
+            if (index != null) {
                 StampNumber(
-                    number = number,
+                    number = index,
                     seed = seed,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
@@ -486,10 +507,10 @@ private class StampLook(seed: Int) {
 }
 
 @Composable
-public fun FeldHandDiamond(
+internal fun HandDiamond(
     color: Color,
-    seed: Int,
     modifier: Modifier = Modifier,
+    seed: Int = rememberSeed(),
     size: Dp = 22.dp,
     brush: Brush? = null,
 ) {
@@ -521,7 +542,7 @@ private fun gauss(t: Float, c: Float, w: Float): Float {
 internal fun beatScale(t: Float?): Float =
     if (t == null) 1f else 1f + 0.18f * gauss(t, 0.07f, 0.05f) + 0.11f * gauss(t, 0.34f, 0.06f)
 
-public fun DrawScope.drawDiamondBeat(brush: Brush, hold: Float, t: Float?) {
+internal fun DrawScope.drawDiamondBeat(brush: Brush, hold: Float, t: Float?) {
     val stroke = 1.5.dp.toPx()
     val r = size.minDimension / 2f + 6.dp.toPx()
     fun diamond(rad: Float) = Path().apply {
@@ -593,30 +614,30 @@ private fun DrawScope.drawTab(brush: Brush, seed: Int, barWidth: Float = size.wi
 
 @Preview(widthDp = 380, heightDp = 520, showBackground = true, backgroundColor = 0xFF0B1011)
 @Composable
-private fun FeldEntryCardPreview() {
+private fun FeldNoteCardPreview() {
     FeldTheme {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            FeldEntryCard(
-                "Logic",
-                Color(0xFF4FB3A6),
-                "This is impossible. He is not from Revachol. He is not even from this isola, and nobody here has ever heard of a place like that.",
-                number = 1,
+            FeldNoteCard(
+                "Title",
+                FeldPalette.Teal,
+                "A longer note that wraps onto a second line to show how the card grows with its text.",
+                index = 1,
                 seed = 1,
                 onClick = {},
             )
-            FeldEntryCard(
-                "Empathy",
-                Color(0xFFD06A8B),
-                "He looks lonely.",
-                number = 2,
+            FeldNoteCard(
+                "Short",
+                FeldPalette.Orange,
+                "One line.",
+                index = 2,
                 seed = 2,
                 onClick = {},
             )
-            FeldEntryCard(
-                "Drama",
-                Color(0xFF8F6FD6),
-                "Oh, what a magnificent entrance. The orange clothes. The ridiculous hair.",
-                number = 3,
+            FeldNoteCard(
+                "Dragging",
+                FeldPalette.Cream,
+                "A note being dragged.",
+                index = 3,
                 seed = 3,
                 isDragging = true,
             )

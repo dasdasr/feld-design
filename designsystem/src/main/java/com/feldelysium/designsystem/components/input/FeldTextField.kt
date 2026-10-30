@@ -72,6 +72,7 @@ internal object FeldRough {
     }
 }
 
+/** A multiline text field on paper with an optional length counter. */
 @Composable
 public fun FeldTextField(
     value: String,

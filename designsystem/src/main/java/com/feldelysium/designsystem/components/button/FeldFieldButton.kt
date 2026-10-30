@@ -34,6 +34,7 @@ import com.feldelysium.designsystem.foundation.seed.rememberSeed
 import com.feldelysium.designsystem.foundation.shape.RoughShape
 import com.feldelysium.designsystem.theme.FeldPalette
 
+/** A field-looking button showing a value, or a muted placeholder, and a chevron. */
 @Composable
 public fun FeldFieldButton(
     text: String?,

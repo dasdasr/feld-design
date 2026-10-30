@@ -42,6 +42,7 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -86,6 +87,7 @@ private val OffText = Color(0xFFD8CCB0)
 private val DividerColor = Color(0xFFB9AD92)
 private val Snap = CubicBezierEasing(0.16f, 1f, 0.3f, 1f)
 
+/** A full-width segmented control. */
 @Composable
 public fun FeldSegmentedControl(
     options: List<String>,
@@ -158,6 +160,7 @@ public fun FeldSegmentedControl(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
+                        .padding(horizontal = 4.dp)
                         .semantics(mergeDescendants = true) {
                             role = Role.Tab
                             this.selected = isSelected
@@ -188,6 +191,8 @@ public fun FeldSegmentedControl(
                         text = label.uppercase(),
                         style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.6.sp),
                         color = lerp(OffText, OnText, (1f - abs(position - i)).coerceIn(0f, 1f)),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -231,7 +236,7 @@ private fun FeldSegmentedControlPreview() {
         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
             var a by remember { mutableIntStateOf(0) }
             var b by remember { mutableIntStateOf(1) }
-            FeldSegmentedControl(listOf("Tab 1", "Tab 2", "Tab 3"), a, { a = it })
+            FeldSegmentedControl(listOf("Tab 1", "Tab 2", "Tab 33333333333"), a, { a = it })
             FeldSegmentedControl(listOf("Media", "Color"), b, { b = it })
         }
     }

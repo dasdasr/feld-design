@@ -34,6 +34,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import com.feldelysium.designsystem.components.button.FeldButton
 import com.feldelysium.designsystem.components.button.FeldButtonDefaults
+import com.feldelysium.designsystem.components.button.FeldDialogActions
 import com.feldelysium.designsystem.components.button.FeldIconButton
 import com.feldelysium.designsystem.components.content.FeldDistressedTitle
 import com.feldelysium.designsystem.components.content.FeldDistressedTitles
@@ -47,14 +48,14 @@ import com.feldelysium.designsystem.foundation.seed.rememberSeed
 import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 
+/** A full-width dialog with a [FeldCard] surface, dismiss button, title and optional footer. */
 @Composable
 public fun FeldDialog(
     title: String,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     eyebrow: String? = null,
-    @Suppress("UNUSED_PARAMETER") subtitle: String? = null,
-    headerNote: String? = "Feld Elysium\n// UI system",
+    headerNote: String? = "Feld Design\n// UI system",
     ambient: Float? = 0.6f,
     seed: Int = rememberSeed(),
     footer: (@Composable () -> Unit)? = null,
@@ -158,48 +159,6 @@ private fun FeldDialogHeader(title: String, onDismiss: () -> Unit, eyebrow: Stri
     }
 }
 
-@Composable
-public fun FeldDialogFooter(
-    onCancel: () -> Unit,
-    modifier: Modifier = Modifier,
-    onReset: (() -> Unit)? = null,
-    cancelLabel: String = "RESET",
-    confirmLabel: String = "SAVE",
-    seed: Int = rememberSeed(),
-    buttonSpec: DryPaperSpec = FeldButtonDefaults.Orange,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
-            if (onReset != null) {
-                Text(
-                    text = cancelLabel,
-                    style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.6.sp),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier
-                        .feldClickable(onClick = onReset)
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                )
-            }
-        }
-        FeldButton(
-            confirmLabel,
-            onClick = onCancel,
-            modifier = Modifier.weight(1f),
-            spec = buttonSpec,
-            seed = seed,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 18.dp),
-        )
-    }
-}
-
 @Preview(showBackground = true, backgroundColor = 0xFF111819)
 @Composable
 private fun FeldDialogPreview() {
@@ -207,13 +166,12 @@ private fun FeldDialogPreview() {
         FeldDialog(
             title = "Create Speaker",
             eyebrow = "NEW IDENTITY",
-            subtitle = "Give this voice a place in the world",
             onDismiss = {},
             seed = 42,
             footer = {
-                FeldDialogFooter(
+                FeldDialogActions(
+                    onConfirm = {},
                     onCancel = {},
-                    onReset = {},
                     cancelLabel = "CLEAR",
                     confirmLabel = "SAVE",
                     seed = 42,
@@ -259,8 +217,8 @@ private fun FeldDialogMinimalPreview() {
             onDismiss = {},
             seed = 12,
             footer = {
-                FeldDialogFooter(
-                    onCancel = {},
+                FeldDialogActions(
+                    onConfirm = {},
                     cancelLabel = "DISCARD",
                     confirmLabel = "KEEP EDITING",
                     seed = 12,
@@ -271,29 +229,6 @@ private fun FeldDialogMinimalPreview() {
                 text = "Your changes have not been saved.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF111819)
-@Composable
-private fun FeldDialogFooterPreview() {
-    FeldTheme {
-        Column(Modifier.padding(16.dp)) {
-            FeldDialogFooter(
-                onCancel = {},
-                onReset = {},
-                cancelLabel = "RESET",
-                confirmLabel = "SAVE",
-                seed = 1,
-            )
-
-            FeldDialogFooter(
-                onCancel = {},
-                cancelLabel = "CANCEL",
-                confirmLabel = "CONFIRM",
-                seed = 2,
             )
         }
     }

@@ -73,7 +73,7 @@ private val OffSpec = FeldPaper.DryButtonRust.copy(
 )
 private val RimSpec = FeldPaper.Panel.copy(
     wear = 0.18f,
-    ink = Color(0xFF8C8E8A),
+    ink = FeldPalette.Muted,
     inkWidth = 1.2.dp,
     inkMinAlpha = 0.75f,
 )
@@ -94,6 +94,7 @@ private class SideRoundShape(private val l: Float, private val r: Float) : Shape
     }
 }
 
+/** A switch that toggles by tap or drag. */
 @Composable
 public fun FeldSwitch(
     checked: Boolean,

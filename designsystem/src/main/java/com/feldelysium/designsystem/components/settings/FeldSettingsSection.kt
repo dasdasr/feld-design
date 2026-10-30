@@ -18,6 +18,7 @@ import com.feldelysium.designsystem.components.content.FeldIcon
 import com.feldelysium.designsystem.components.content.FeldIconId
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
 
+/** A settings section: tag title, content and bottom spacing. */
 @Composable
 public fun FeldSettingsSection(
     title: String,
@@ -33,6 +34,7 @@ public fun FeldSettingsSection(
     }
 }
 
+/** A horizontal divider with side insets for settings lists. */
 @Composable
 public fun FeldSettingsDivider(modifier: Modifier = Modifier) {
     FeldDivider(

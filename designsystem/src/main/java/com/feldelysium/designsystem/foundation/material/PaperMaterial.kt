@@ -18,6 +18,7 @@ import com.feldelysium.designsystem.foundation.material.agsl.PAPER_AGSL
 import com.feldelysium.designsystem.foundation.shape.RoughShape
 import com.feldelysium.designsystem.foundation.shape.buildInkLayers
 import com.feldelysium.designsystem.foundation.shape.drawInk
+import com.feldelysium.designsystem.theme.FeldPalette
 import kotlin.math.PI
 import kotlin.math.sin
 import androidx.compose.ui.graphics.lerp as lerpColor
@@ -66,7 +67,7 @@ public object FeldPaper {
     public val Panel: PaperSpec = PaperSpec(
         base = Color(0xFF0C1212),
         scuff = Color(0xFF1F2929),
-        ink = Color(0xFF666866),
+        ink = FeldPalette.Line,
 
         wear = 0.22f,
         edgeWear = 0.6f,
@@ -86,7 +87,7 @@ public object FeldPaper {
         inkContrast = 1.8f,
     )
 
-    public val Entry: PaperSpec = Panel.copy(
+    public val Note: PaperSpec = Panel.copy(
         wear = 0.16f,
         edgeWear = 0.5f,
         edgeBand = 10.dp,
@@ -110,7 +111,7 @@ public object FeldPaper {
         inkContrast = 1.2f,
     )
 
-    public val Field: PaperSpec = Entry.copy(
+    public val Field: PaperSpec = Note.copy(
         wear = 0.2f,
         edgeWear = 0.55f,
         maxLoss = 0.4f,
@@ -119,7 +120,7 @@ public object FeldPaper {
     )
 
     public val DryButtonCream: PaperSpec = PaperSpec(
-        base = Color(0xFFDCCFB5),
+        base = FeldPalette.Cream,
         scuff = Color(0xFFB7A88D),
         ink = Color(0xFF29231D),
 

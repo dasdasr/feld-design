@@ -22,6 +22,7 @@ import com.feldelysium.designsystem.foundation.seed.rememberSeed
 import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 
+/** A bottom bar with a cancel action and an optional confirm button. */
 @Composable
 public fun FeldActionBar(
     onCancel: () -> Unit,

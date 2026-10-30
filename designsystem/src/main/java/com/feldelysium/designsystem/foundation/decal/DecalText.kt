@@ -15,19 +15,19 @@ internal object DecalText {
             add("DEVICE TAPE ${1 + rng.nextInt(4)}")
             add("REC. ${pad(rng.nextInt(60), 4)}-${'A' + rng.nextInt(4)}")
             add("END")
-            if (c.sceneName.isNotBlank()) add("${c.sceneName.uppercase().take(18)} • ${c.date}")
-            if (c.segmentFrom != null && c.segmentTo != null) {
-                add("SEG ${pad(c.segmentFrom, 4)}-${pad(c.segmentTo, 4)}")
+            if (c.groupName.isNotBlank()) add("${c.groupName.uppercase().take(18)} • ${c.date}")
+            if (c.rangeFrom != null && c.rangeTo != null) {
+                add("SEG ${pad(c.rangeFrom, 4)}-${pad(c.rangeTo, 4)}")
             }
-            c.speakerName?.let { add("VOICE: ${it.uppercase().take(14)}") }
+            c.title?.let { add("VOICE: ${it.uppercase().take(14)}") }
             c.appVersion?.let { add("FELD V$it") }
         }
         return pool[rng.nextInt(pool.size)]
     }
 
     fun dataBlock(rng: Random, c: DecalContext): String {
-        val from = c.segmentFrom ?: rng.nextInt(1, 40)
-        val to = c.segmentTo ?: (from + rng.nextInt(2, 30))
+        val from = c.rangeFrom ?: rng.nextInt(1, 40)
+        val to = c.rangeTo ?: (from + rng.nextInt(2, 30))
         val side = if (rng.nextBoolean()) 'A' else 'B'
         val lines = listOf(
             "REEL NO. ${1 + rng.nextInt(6)}/SIDE $side/SEGMENT ${pad(from, 4)}-${pad(to, 4)}",
@@ -40,8 +40,8 @@ internal object DecalText {
     fun counter(rng: Random, c: DecalContext): String = when (rng.nextInt(4)) {
         0 -> rng.nextInt(10, 99).toString()
 
-        1 -> c.lineNumber?.let { n ->
-            "L.${pad(n, 2)}" + (c.lineCount?.let { "/${pad(it, 2)}" } ?: "")
+        1 -> c.index?.let { n ->
+            "L.${pad(n, 2)}" + (c.count?.let { "/${pad(it, 2)}" } ?: "")
         } ?: "№ ${pad(rng.nextInt(99), 4)}"
 
         2 -> "REC. ${pad(rng.nextInt(60), 4)}-B"

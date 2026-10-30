@@ -28,6 +28,7 @@ import com.feldelysium.designsystem.foundation.seed.rememberSeed
 import com.feldelysium.designsystem.foundation.sound.feldSounds
 import com.feldelysium.designsystem.theme.FeldTheme
 
+/** A backgroundless uppercase text button for secondary actions. */
 @Composable
 public fun FeldTextButton(
     text: String,
@@ -49,12 +50,13 @@ public fun FeldTextButton(
     )
 }
 
+/** A dialog action row with an optional cancel action and a confirm button. */
 @Composable
 public fun FeldDialogActions(
     confirmLabel: String,
     onConfirm: () -> Unit,
-    modifier: Modifier = Modifier,
     cancelLabel: String,
+    modifier: Modifier = Modifier,
     onCancel: (() -> Unit)? = null,
     confirmEnabled: Boolean = true,
     seed: Int = rememberSeed(),
@@ -82,15 +84,12 @@ public fun FeldDialogActions(
         FeldButton(
             text = confirmLabel,
             onClick = {
-                if (confirmEnabled) {
-                    sounds.click(seed)
-                    onConfirm()
-                }
+                sounds.click(seed)
+                onConfirm()
             },
+            enabled = confirmEnabled,
             spec = if (confirmEnabled) FeldButtonDefaults.OrangeFresh else FeldButtonDefaults.Cream,
-            modifier = Modifier
-                .weight(1f)
-                .alpha(if (confirmEnabled) 1f else 0.45f),
+            modifier = Modifier.weight(1f),
             seed = seed,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -107,6 +106,7 @@ private fun Modifier.pullUp(amount: Dp): Modifier = layout { measurable, constra
     }
 }
 
+/** A content section with an overlapping title tag. */
 @Composable
 public fun FeldLabeledBlock(
     label: String,
@@ -148,7 +148,7 @@ private fun FeldDialogActionsPreview() {
             )
 
             FeldDialogActions(
-                confirmLabel = "Create speaker",
+                confirmLabel = "Create new",
                 cancelLabel = "Back",
                 onConfirm = {},
                 onCancel = {},

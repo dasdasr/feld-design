@@ -22,9 +22,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.feldelysium.designsystem.components.input.feldClickable
 import com.feldelysium.designsystem.foundation.decal.DecalContext
 import com.feldelysium.designsystem.foundation.decal.DecalSpec
 import com.feldelysium.designsystem.foundation.decal.LocalFeldDecalContext
@@ -35,8 +37,10 @@ import com.feldelysium.designsystem.foundation.material.paperMaterial
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
 import com.feldelysium.designsystem.foundation.shape.RoughShape
 import com.feldelysium.designsystem.foundation.shape.RoughStyle
+import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 
+/** A paper card with decals; the base container of the library. */
 @Composable
 public fun FeldCard(
     modifier: Modifier = Modifier,
@@ -95,7 +99,10 @@ public fun FeldCard(
             )
             .then(
                 if (onClick != null) {
-                    Modifier.clickable(interactionSource = interaction, indication = null, onClick = onClick)
+                    Modifier.feldClickable(
+                        interactionSource = interaction,
+                        onClick = onClick,
+                    )
                 } else {
                     Modifier
                 },
@@ -145,13 +152,13 @@ private fun SampleCard(seed: Int = rememberSeed(), spec: PaperSpec = FeldPaper.P
         onClick = {},
     ) {
         Text(
-            text = "LOGIC",
+            text = "FIELD NOTE",
             style = MaterialTheme.typography.labelSmall,
-            color = Color(0xFF4FB3A6),
+            color = FeldPalette.Teal,
         )
 
         Text(
-            text = "Let's be precise. What do you actually remember about that night?",
+            text = "A short note goes here.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 6.dp),

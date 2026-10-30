@@ -57,6 +57,7 @@ import kotlin.math.abs
 
 private val OffColor = Color(0xFF1F2322)
 
+/** A slider with a textured track and a choice of thumb shapes. */
 @Composable
 public fun FeldSlider(
     value: Float,
@@ -108,7 +109,7 @@ public fun FeldSlider(
                 .semantics {
                     progressBarRangeInfo = ProgressBarRangeInfo(value, valueRange)
                     setProgress { v ->
-                        onValueChange(v.coerceIn(valueRange))
+                        currentOnChange(v.coerceIn(valueRange))
                         true
                     }
                 }

@@ -9,12 +9,12 @@ import java.util.Locale
 
 @Immutable
 public data class DecalContext(
-    val sceneName: String = "",
-    val lineNumber: Int? = null,
-    val lineCount: Int? = null,
-    val segmentFrom: Int? = null,
-    val segmentTo: Int? = null,
-    val speakerName: String? = null,
+    val groupName: String = "",
+    val index: Int? = null,
+    val count: Int? = null,
+    val rangeFrom: Int? = null,
+    val rangeTo: Int? = null,
+    val title: String? = null,
     val appVersion: String? = null,
     val date: String = retroDate(),
 )

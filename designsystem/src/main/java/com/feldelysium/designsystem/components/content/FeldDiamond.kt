@@ -33,8 +33,9 @@ private fun diamondSpec(color: Color) = DryPaperSpec(
     mottleStrength = 0.22f,
 )
 
+/** A dry-paper diamond of the given color. */
 @Composable
-public fun FeldSpeakerDiamond(
+public fun FeldDiamond(
     color: Color,
     modifier: Modifier = Modifier,
     size: Dp = 32.dp,

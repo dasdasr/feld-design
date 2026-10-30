@@ -45,6 +45,7 @@ public data class FeldToolbarItem(
     val onClick: () -> Unit,
 )
 
+/** A row of equal cells separated by dividers. */
 @Composable
 public fun FeldToolbar(items: List<FeldToolbarItem>, modifier: Modifier = Modifier, seed: Int = rememberSeed()) {
     Column(modifier.fillMaxWidth()) {
