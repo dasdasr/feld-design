@@ -93,121 +93,221 @@ public class RoughShape(public val seed: Int, public val style: RoughStyle = Rou
         style.roughness.toPx() * (1.5f + style.jerkAmp + style.cornerJitter) + style.inset.toPx()
     }
 
-    internal fun buildPath(size: Size, density: Density): Path {
-        if (size.minDimension <= 0f) return Path()
+    private data class PathConfig(
+        val amp: Float,
+        val rim: Float,
+        val step: Float,
+        val corner: Float,
+        val jerkWidth: Float,
+        val smooth: Float,
+    )
 
-        val amp = with(density) { style.roughness.toPx() }
-        val rim = rimPx(density)
-        val stepPx = with(density) { style.step.toPx() }
-        val cornerPx = with(density) { style.corner.toPx() }
-        val jw = with(density) { style.jerkWidth.toPx() }
-        val smooth = style.smoothness.coerceIn(0f, 0.95f)
+    private data class CornerData(
+        val points: List<Offset>,
+        val torn: BooleanArray,
+        val radius: FloatArray,
+        val scale: FloatArray,
+    )
 
-        val rnd = Random(seed)
-        fun j(a: Float) = (rnd.nextFloat() * 2f - 1f) * a
+    private class PathNoise(val random: Random, val table: FloatArray) {
+        var drift: Float = 0f
+        var jerkOffset: Float = 0f
 
-        val table = FloatArray(32) { rnd.nextFloat() }
-        fun envelope(s: Float): Float {
-            val x = s / (stepPx * 2.5f)
+        fun jitter(amount: Float): Float = (random.nextFloat() * 2f - 1f) * amount
+
+        fun envelope(distance: Float, step: Float, irregularity: Float): Float {
+            val x = distance / (step * 2.5f)
             val i = floor(x).toInt()
             val f = x - i
             val u = f * f * (3f - 2f * f)
             val a = table[i.mod(32)]
             val b = table[(i + 1).mod(32)]
             val v = (a + (b - a) * u).pow(1.5f)
-            return (1f - style.irregularity) + v * (style.irregularity * 1.5f)
+
+            return (1f - irregularity) + v * (irregularity * 1.5f)
+        }
+    }
+
+    private fun pathConfig(density: Density): PathConfig = with(density) {
+        PathConfig(
+            amp = style.roughness.toPx(),
+            rim = rimPx(density),
+            step = style.step.toPx(),
+            corner = style.corner.toPx(),
+            jerkWidth = style.jerkWidth.toPx(),
+            smooth = style.smoothness.coerceIn(0f, 0.95f),
+        )
+    }
+
+    private fun createCorners(size: Size, config: PathConfig, noise: PathNoise): CornerData {
+        val torn = BooleanArray(4) {
+            it == style.forceTorn || noise.random.nextFloat() < style.tornChance
         }
 
-        val torn = BooleanArray(4) { it == style.forceTorn || rnd.nextFloat() < style.tornChance }
-
-        val cj = amp * style.cornerJitter
+        val cornerJitter = config.amp * style.cornerJitter
         val sx = floatArrayOf(-1f, 1f, 1f, -1f)
         val sy = floatArrayOf(-1f, -1f, 1f, 1f)
-        val base4 = listOf(
-            Offset(rim, rim),
-            Offset(size.width - rim, rim),
-            Offset(size.width - rim, size.height - rim),
-            Offset(rim, size.height - rim),
+
+        val base = listOf(
+            Offset(config.rim, config.rim),
+            Offset(size.width - config.rim, config.rim),
+            Offset(size.width - config.rim, size.height - config.rim),
+            Offset(config.rim, size.height - config.rim),
         )
-        val corners = base4.mapIndexed { i, o ->
-            val push = if (torn[i]) rim * style.tornPush else 0f
-            Offset(o.x + j(cj) + sx[i] * push, o.y + j(cj) + sy[i] * push)
+
+        val points = base.mapIndexed { i, point ->
+            val push = if (torn[i]) config.rim * style.tornPush else 0f
+            Offset(
+                point.x + noise.jitter(cornerJitter) + sx[i] * push,
+                point.y + noise.jitter(cornerJitter) + sy[i] * push,
+            )
         }
+
         val radius = FloatArray(4) { i ->
-            val r =
-                cornerPx * (1f - style.cornerVariation + rnd.nextFloat() * 2f * style.cornerVariation)
-            if (torn[i]) r * 0.15f else r
+            val value = config.corner * (
+                1f - style.cornerVariation +
+                    noise.random.nextFloat() * 2f * style.cornerVariation
+                )
+            if (torn[i]) value * 0.15f else value
         }
-        val cornerScale = floatArrayOf(
+
+        val scale = floatArrayOf(
             style.leftCornerScale,
             style.rightCornerScale,
             style.rightCornerScale,
             style.leftCornerScale,
         )
 
+        return CornerData(points, torn, radius, scale)
+    }
+
+    private fun createSide(
+        index: Int,
+        corners: CornerData,
+        config: PathConfig,
+        noise: PathNoise,
+        perimeter: Float,
+    ): List<Knot> {
+        val a = corners.points[index]
+        val b = corners.points[(index + 1) % 4]
+        val length = (b - a).getDistance()
+        val direction = (b - a) / length
+        val normal = Offset(-direction.y, direction.x)
+
+        val start = a + direction * (corners.radius[index] * corners.scale[index])
+        val endIndex = (index + 1) % 4
+        val end = b - direction * (corners.radius[endIndex] * corners.scale[endIndex])
+
+        val normalStart = a + direction * corners.radius[index]
+        val normalEnd = b - direction * corners.radius[endIndex]
+        val steps = (
+            (normalEnd - normalStart).getDistance() / config.step
+            ).roundToInt().coerceAtLeast(1)
+
+        val maxDrift = config.amp * 1.5f
+        val result = ArrayList<Knot>()
+
+        for (k in 0..steps) {
+            val t = k / steps.toFloat()
+            val base = lerp(start, end, t)
+
+            noise.drift = noise.drift * config.smooth +
+                noise.jitter(1f) * (1f - config.smooth)
+
+            val deviation = (
+                noise.drift * config.amp *
+                    noise.envelope(
+                        perimeter + t * length,
+                        config.step,
+                        style.irregularity,
+                    ) * 1.6f
+                ).coerceIn(-maxDrift, maxDrift)
+
+            val slide = if (k in 1 until steps) {
+                noise.jitter(config.step * style.slide)
+            } else {
+                0f
+            }
+
+            val jerk = k in 1 until steps &&
+                noise.random.nextFloat() < style.jerkChance
+
+            if (jerk) {
+                result += Knot(
+                    base + normal * (deviation + noise.jerkOffset) +
+                        direction * (slide - config.jerkWidth * 0.5f),
+                    jumpNext = true,
+                )
+
+                val sign = if (noise.random.nextBoolean()) 1f else -1f
+                noise.jerkOffset = sign *
+                    (0.5f + noise.random.nextFloat() * 0.5f) *
+                    config.amp * style.jerkAmp
+
+                result += Knot(
+                    base + normal * (deviation + noise.jerkOffset) +
+                        direction * (slide + config.jerkWidth * 0.5f),
+                )
+            } else {
+                noise.jerkOffset *= 0.6f
+                result += Knot(
+                    base + normal * (deviation + noise.jerkOffset) +
+                        direction * slide,
+                )
+            }
+        }
+
+        return result
+    }
+
+    private fun createSides(corners: CornerData, config: PathConfig, noise: PathNoise): List<List<Knot>> {
         var perimeter = 0f
-        var drift = 0f
-        var jerkOff = 0f
-        val maxDrift = amp * 1.5f
 
-        val sides = List(4) { i ->
-            val a = corners[i]
-            val b = corners[(i + 1) % 4]
+        return List(4) { index ->
+            val a = corners.points[index]
+            val b = corners.points[(index + 1) % 4]
             val length = (b - a).getDistance()
-            val dir = (b - a) / length
-            val normal = Offset(-dir.y, dir.x)
-            val start = a + dir * (radius[i] * cornerScale[i])
-            val end = b - dir * (radius[(i + 1) % 4] * cornerScale[(i + 1) % 4])
-            val nStart = a + dir * radius[i]
-            val nEnd = b - dir * radius[(i + 1) % 4]
-            val n = ((nEnd - nStart).getDistance() / stepPx).roundToInt().coerceAtLeast(1)
-            val sideStart = perimeter
-            perimeter += length
 
-            buildList {
-                for (k in 0..n) {
-                    val t = k / n.toFloat()
-                    val base = lerp(start, end, t)
-                    drift = drift * smooth + j(1f) * (1f - smooth)
-                    val dev = (drift * amp * envelope(sideStart + t * length) * 1.6f)
-                        .coerceIn(-maxDrift, maxDrift)
-                    val slide = if (k in 1 until n) j(stepPx * style.slide) else 0f
+            createSide(index, corners, config, noise, perimeter).also {
+                perimeter += length
+            }
+        }
+    }
 
-                    val jerk = k in 1 until n && rnd.nextFloat() < style.jerkChance
-                    if (jerk) {
-                        add(
-                            Knot(
-                                base + normal * (dev + jerkOff) + dir * (slide - jw * 0.5f),
-                                jumpNext = true,
-                            ),
-                        )
-                        val sign = if (rnd.nextBoolean()) 1f else -1f
-                        jerkOff = sign * (0.5f + rnd.nextFloat() * 0.5f) * amp * style.jerkAmp
-                        add(Knot(base + normal * (dev + jerkOff) + dir * (slide + jw * 0.5f)))
-                    } else {
-                        jerkOff *= 0.6f
-                        add(Knot(base + normal * (dev + jerkOff) + dir * slide))
-                    }
-                }
+    private fun assemblePath(sides: List<List<Knot>>, corners: CornerData): Path = Path().apply {
+        moveTo(sides[0][0].p.x, sides[0][0].p.y)
+
+        for (i in 0 until 4) {
+            catmullRomTo(sides[i])
+
+            val cornerIndex = (i + 1) % 4
+            val corner = corners.points[cornerIndex]
+            val next = sides[cornerIndex][0].p
+
+            if (corners.torn[cornerIndex]) {
+                lineTo(corner.x, corner.y)
+                lineTo(next.x, next.y)
+            } else {
+                quadraticTo(corner.x, corner.y, next.x, next.y)
             }
         }
 
-        return Path().apply {
-            moveTo(sides[0][0].p.x, sides[0][0].p.y)
-            for (i in 0 until 4) {
-                catmullRomTo(sides[i])
-                val ci = (i + 1) % 4
-                val c = corners[ci]
-                val next = sides[ci][0].p
-                if (torn[ci]) {
-                    lineTo(c.x, c.y)
-                    lineTo(next.x, next.y)
-                } else {
-                    quadraticTo(c.x, c.y, next.x, next.y)
-                }
-            }
-            close()
-        }
+        close()
+    }
+
+    internal fun buildPath(size: Size, density: Density): Path {
+        if (size.minDimension <= 0f) return Path()
+
+        val config = pathConfig(density)
+        val random = Random(seed)
+        val noise = PathNoise(
+            random = random,
+            table = FloatArray(32) { random.nextFloat() },
+        )
+        val corners = createCorners(size, config, noise)
+        val sides = createSides(corners, config, noise)
+
+        return assemblePath(sides, corners)
     }
 
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline =
