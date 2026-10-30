@@ -36,7 +36,7 @@ detekt {
     buildUponDefaultConfig = true
     config.setFrom("$rootDir/config/detekt/detekt.yml")
     parallel = true
-    autoCorrect = true
+    autoCorrect = !providers.environmentVariable("CI").isPresent
 }
 
 dependencies {
