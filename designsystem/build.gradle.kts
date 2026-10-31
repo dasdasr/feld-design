@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.detekt)
+    id("maven-publish")
 }
 
 android {
@@ -24,6 +25,12 @@ android {
 
     lint {
         abortOnError = true
+    }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
     }
 }
 
@@ -50,4 +57,15 @@ dependencies {
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     detektPlugins(libs.detekt.rules.ktlint.wrapper)
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            register<MavenPublication>("release") {
+                from(components["release"])
+                artifactId = "designsystem"
+            }
+        }
+    }
 }

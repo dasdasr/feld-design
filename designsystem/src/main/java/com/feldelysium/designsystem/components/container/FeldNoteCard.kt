@@ -227,8 +227,8 @@ public fun FeldNoteCard(
             val fresh = isDragging && now - sway.velocityStamp < SWAY_VELOCITY_TTL_NANOS
             val velocity = if (fresh) sway.velocityY else 0f
             val torque = -SWAY_STIFFNESS * sway.angle -
-                    SWAY_DAMPING * angularVelocity +
-                    SWAY_GAIN * velocity * sway.dir
+                SWAY_DAMPING * angularVelocity +
+                SWAY_GAIN * velocity * sway.dir
 
             angularVelocity += torque * dt
             sway.angle = (sway.angle + angularVelocity * dt)

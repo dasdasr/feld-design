@@ -23,10 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.feldelysium.designsystem.components.button.FeldIconButton
 import com.feldelysium.designsystem.components.container.FeldDivider
-import com.feldelysium.designsystem.components.content.FlatDiamond
 import com.feldelysium.designsystem.components.content.FeldDistressedTitle
 import com.feldelysium.designsystem.components.content.FeldDistressedTitles
 import com.feldelysium.designsystem.components.content.FeldIconId
+import com.feldelysium.designsystem.components.content.FlatDiamond
 import com.feldelysium.designsystem.components.input.feldClickable
 import com.feldelysium.designsystem.foundation.haptics.rememberFeldHaptics
 import com.feldelysium.designsystem.foundation.material.DistressSpec

@@ -38,26 +38,24 @@ import com.feldelysium.designsystem.foundation.shape.RoughShape
 import com.feldelysium.designsystem.foundation.sound.feldSounds
 import com.feldelysium.designsystem.theme.FeldPalette
 
-internal fun swatchSpec(c: Color): PaperSpec {
-    return FeldPaper.DryButtonCream.copy(
-        base = c,
-        scuff = lerp(c, Color.Black, 0.35f),
-        ink = FeldPalette.Cream,
-        inkWidth = 0.dp,
+internal fun swatchSpec(c: Color): PaperSpec = FeldPaper.DryButtonCream.copy(
+    base = c,
+    scuff = lerp(c, Color.Black, 0.35f),
+    ink = FeldPalette.Cream,
+    inkWidth = 0.dp,
 
-        wear = 0.4f,
-        edgeWear = 0.2f,
-        innerWear = 0.3f,
-        scuffTint = 0.35f,
-        chipSize = 5.dp,
-        chipCoverage = 0.5f,
+    wear = 0.4f,
+    edgeWear = 0.2f,
+    innerWear = 0.3f,
+    scuffTint = 0.35f,
+    chipSize = 5.dp,
+    chipCoverage = 0.5f,
 
-        mottleStrength = 0.3f,
-        grainStrength = 0.03f,
-        toothStrength = 0.03f,
-        speckleStrength = 0.03f,
-    )
-}
+    mottleStrength = 0.3f,
+    grainStrength = 0.03f,
+    toothStrength = 0.03f,
+    speckleStrength = 0.03f,
+)
 
 /** A grid of color swatches; the selected one shows a diamond. */
 @Composable

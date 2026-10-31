@@ -4,75 +4,88 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.feldelysium.catalog.ui.ControlSwitch
+import com.feldelysium.catalog.ui.ControlText
 import com.feldelysium.catalog.ui.ShowcaseScreen
+import com.feldelysium.catalog.ui.ShowcaseSpec
+import com.feldelysium.catalog.ui.Subject
+import com.feldelysium.catalog.ui.quoted
 import com.feldelysium.designsystem.components.button.FeldButton
 import com.feldelysium.designsystem.components.button.FeldDialogActions
 import com.feldelysium.designsystem.components.container.FeldDialog
 import com.feldelysium.designsystem.components.input.FeldTextField
 
 
-@Composable
-internal fun DialogShowcase(onBack: () -> Unit) {
-    var open by rememberSaveable { mutableStateOf(false) }
-    var confirmEnabled by rememberSaveable { mutableStateOf(true) }
-    var name by rememberSaveable { mutableStateOf("") }
 
-    if (open) {
-        FeldDialog(
-            title = "Rename scene",
-            eyebrow = "SCENES",
-            onDismiss = { open = false },
-            footer = {
-                FeldDialogActions(
-                    confirmLabel = "Save",
-                    onConfirm = { open = false },
-                    confirmEnabled = confirmEnabled,
-                    cancelLabel = "Cancel",
-                    onCancel = { open = false },
-                )
+private val DialogSubjects = listOf(
+    Subject("Dialog") { _ ->
+        var open by remember { mutableStateOf(false) }
+        var title by remember { mutableStateOf("Rename scene") }
+        var eyebrow by remember { mutableStateOf("Scenes") }
+        var confirmLabel by remember { mutableStateOf("Save") }
+        var confirmEnabled by remember { mutableStateOf(true) }
+        var name by remember { mutableStateOf("") }
+        ShowcaseSpec(
+            preview = {
+                FeldButton(text = "Open dialog", onClick = { open = true })
+                if (open) {
+                    FeldDialog(
+                        title = title,
+                        eyebrow = eyebrow,
+                        onDismiss = { open = false },
+                        footer = {
+                            FeldDialogActions(
+                                confirmLabel = confirmLabel,
+                                onConfirm = { open = false },
+                                confirmEnabled = confirmEnabled,
+                                cancelLabel = "Cancel",
+                                onCancel = { open = false },
+                            )
+                        },
+                    ) {
+                        FeldTextField(
+                            value = name,
+                            onValueChange = { name = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            placeholder = "Scene title",
+                            singleLine = true,
+                        )
+                    }
+                }
             },
-        ) {
-            FeldTextField(
-                value = name,
-                onValueChange = { name = it },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = "Scene title",
-                singleLine = true,
-            )
-        }
-    }
+            controls = {
+                ControlText("title", title) { title = it }
+                ControlText("eyebrow", eyebrow) { eyebrow = it }
+                ControlText("confirm label", confirmLabel) { confirmLabel = it }
+                ControlSwitch("confirm enabled", confirmEnabled) { confirmEnabled = it }
+            },
+            code = {
+                "FeldDialog(\n" +
+                        "    title = ${title.quoted()},\n" +
+                        "    eyebrow = ${eyebrow.quoted()},\n" +
+                        "    onDismiss = { },\n" +
+                        "    footer = {\n" +
+                        "        FeldDialogActions(\n" +
+                        "            confirmLabel = ${confirmLabel.quoted()},\n" +
+                        "            onConfirm = { },\n" +
+                        (if (confirmEnabled) "" else "            confirmEnabled = false,\n") +
+                        "            cancelLabel = \"Cancel\",\n" +
+                        "            onCancel = { },\n" +
+                        "        )\n" +
+                        "    },\n" +
+                        ") {\n" +
+                        "    // content\n" +
+                        "}"
+            },
+            notes = listOf("Tap “Open dialog” on the stage."),
+        )
+    },
+)
 
-    ShowcaseScreen(
-        title = "Dialog",
-        eyebrow = "COMPONENTS",
-        onBack = onBack,
-        preview = { seed ->
-            FeldButton(text = "Open dialog", onClick = { open = true }, seed = seed)
-        },
-        controls = {
-            ControlSwitch("confirm enabled", confirmEnabled) { confirmEnabled = it }
-        },
-        usage = """
-            FeldDialog(
-                title = "Rename scene",
-                eyebrow = "SCENES",
-                onDismiss = { },
-                footer = {
-                    FeldDialogActions(
-                        confirmLabel = "Save",
-                        onConfirm = { },
-                        cancelLabel = "Cancel",
-                        onCancel = { },
-                    )
-                },
-            ) {
-                FeldTextField(value = name, onValueChange = { name = it })
-            }
-        """.trimIndent(),
-        notes = listOf("The footer slot takes any content; FeldDialogActions is the standard pair."),
-    )
-}
+@Composable
+internal fun DialogShowcase(onBack: () -> Unit) =
+    ShowcaseScreen("Dialog", "COMPONENTS", onBack, DialogSubjects)

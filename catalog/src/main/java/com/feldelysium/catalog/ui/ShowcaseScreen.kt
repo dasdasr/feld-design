@@ -2,6 +2,7 @@ package com.feldelysium.catalog.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.feldelysium.designsystem.components.button.FeldTextButton
 import com.feldelysium.designsystem.components.container.FeldDivider
 import com.feldelysium.designsystem.components.content.FeldIconId
+import com.feldelysium.designsystem.components.input.FeldChip
 import com.feldelysium.designsystem.components.input.FeldSegmentedControl
 import com.feldelysium.designsystem.components.input.FeldSwitch
 import com.feldelysium.designsystem.components.navigation.FeldScreenHeader
@@ -47,70 +49,78 @@ internal val CatalogMono = TextStyle(
     letterSpacing = 1.4.sp,
 )
 
-private enum class ShowcaseTab(val label: String) {
-    Variants("Variants"),
-    Controls("Controls"),
-    Usage("Usage"),
-}
+internal class ShowcaseSpec(
+    val preview: @Composable () -> Unit,
+    val controls: @Composable ColumnScope.() -> Unit,
+    val code: () -> String,
+    val variants: (@Composable ColumnScope.() -> Unit)? = null,
+    val variantsLabel: String = "Variants",
+    val notes: List<String> = emptyList(),
+    val textured: Boolean = false,
+)
+
+/** A component showcased within a group page. */
+internal class Subject(
+    val name: String,
+    val build: @Composable (seed: Int) -> ShowcaseSpec,
+)
+
+private enum class Tab { Controls, Variants, Code }
 
 @Composable
 internal fun ShowcaseScreen(
     title: String,
     eyebrow: String,
     onBack: () -> Unit,
-    preview: @Composable ColumnScope.(seed: Int) -> Unit,
-    variants: (@Composable ColumnScope.(seed: Int) -> Unit)? = null,
-    controls: (@Composable ColumnScope.(seed: Int) -> Unit)? = null,
-    usage: String? = null,
-    notes: List<String> = emptyList(),
+    subjects: List<Subject>,
 ) {
+    var subjectIndex by rememberSaveable { mutableIntStateOf(0) }
     var seed by rememberSaveable { mutableIntStateOf(1) }
     var tabIndex by rememberSaveable { mutableIntStateOf(0) }
-
-    val tabs = buildList {
-        if (variants != null) add(ShowcaseTab.Variants)
-        if (controls != null) add(ShowcaseTab.Controls)
-        if (usage != null || notes.isNotEmpty()) add(ShowcaseTab.Usage)
-    }
-    val tab = tabs.getOrNull(tabIndex) ?: tabs.firstOrNull()
 
     Column(
         Modifier
             .fillMaxSize()
             .systemBarsPadding(),
     ) {
-        FeldScreenHeader(
-            title = title,
-            eyebrow = eyebrow,
-            navIcon = FeldIconId.Back,
-            onNav = onBack,
-        )
+        FeldScreenHeader(title = title, eyebrow = eyebrow, navIcon = FeldIconId.Back, onNav = onBack)
 
-        Stage(seed = seed, onReroll = { seed += 1 }, content = preview)
+        if (subjects.size > 1) {
+            SubjectPicker(subjects.map { it.name }, subjectIndex) { subjectIndex = it }
+        }
 
-        if (tabs.size > 1) {
+        key(subjectIndex) {
+            val spec = subjects[subjectIndex].build(seed)
+            val tabs = buildList {
+                add(Tab.Controls)
+                if (spec.variants != null) add(Tab.Variants)
+                add(Tab.Code)
+            }
+            val tab = tabs[tabIndex.coerceIn(tabs.indices)]
+
+            Stage(spec.textured, seed, onReroll = { seed += 1 }, content = spec.preview)
+
             Box(Modifier.padding(horizontal = 20.dp, vertical = 14.dp)) {
                 FeldSegmentedControl(
-                    options = tabs.map { it.label },
+                    options = tabs.map { if (it == Tab.Variants) spec.variantsLabel else it.name },
                     selectedIndex = tabs.indexOf(tab),
                     onSelect = { tabIndex = it },
                 )
             }
-        }
 
-        key(tab) {
-            Column(
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 4.dp, bottom = 40.dp),
-            ) {
-                when (tab) {
-                    ShowcaseTab.Variants -> variants?.invoke(this, seed)
-                    ShowcaseTab.Controls -> controls?.invoke(this, seed)
-                    ShowcaseTab.Usage -> UsageTab(usage, notes)
-                    null -> Unit
+            key(tab) {
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp)
+                        .padding(bottom = 40.dp),
+                ) {
+                    when (tab) {
+                        Tab.Controls -> spec.controls(this)
+                        Tab.Variants -> spec.variants?.invoke(this)
+                        Tab.Code -> CodeTab(spec.code, spec.notes)
+                    }
                 }
             }
         }
@@ -118,11 +128,22 @@ internal fun ShowcaseScreen(
 }
 
 @Composable
-private fun Stage(
-    seed: Int,
-    onReroll: () -> Unit,
-    content: @Composable ColumnScope.(seed: Int) -> Unit,
-) {
+private fun SubjectPicker(names: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        names.forEachIndexed { i, name ->
+            FeldChip(text = name, selected = i == selected, onClick = { onSelect(i) })
+        }
+    }
+}
+
+@Composable
+private fun Stage(textured: Boolean, seed: Int, onReroll: () -> Unit, content: @Composable () -> Unit) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -131,35 +152,39 @@ private fun Stage(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 8.dp),
+                .padding(start = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("PREVIEW", style = CatalogMono, color = FeldPalette.Muted, modifier = Modifier.weight(1f))
-            FeldTextButton(text = "Reroll · $seed", onClick = onReroll)
+            Text("LIVE PREVIEW", style = CatalogMono, color = FeldPalette.Orange, modifier = Modifier.weight(1f))
+            if (textured) {
+                Text(
+                    "↻ NEW TEXTURE · $seed",
+                    style = CatalogMono,
+                    color = FeldPalette.Cream,
+                    modifier = Modifier
+                        .clickable(onClick = onReroll)
+                        .padding(horizontal = 20.dp, vertical = 14.dp),
+                )
+            }
         }
-        Column(
+        Box(
             Modifier
                 .fillMaxWidth()
-                .heightIn(min = 140.dp, max = 300.dp)
+                .heightIn(min = 120.dp, max = 260.dp)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            content(seed)
-        }
+            contentAlignment = Alignment.Center,
+        ) { content() }
         FeldDivider()
     }
 }
 
 @Composable
-private fun UsageTab(usage: String?, notes: List<String>) {
-    if (usage != null) {
-        SectionLabel("Kotlin")
-        CodeBlock(usage)
-        Spacer(Modifier.height(28.dp))
-    }
+private fun CodeTab(code: () -> String, notes: List<String>) {
+    SectionLabel("Generated from the controls")
+    CodeBlock(code())
     if (notes.isNotEmpty()) {
+        Spacer(Modifier.height(28.dp))
         SectionLabel("Notes")
         notes.forEach {
             Text(
@@ -170,12 +195,6 @@ private fun UsageTab(usage: String?, notes: List<String>) {
             )
         }
     }
-}
-
-@Composable
-internal fun SectionLabel(text: String) {
-    Text(text.uppercase(), style = CatalogMono, color = FeldPalette.Orange, modifier = Modifier.padding(top = 8.dp))
-    FeldDivider(modifier = Modifier.padding(vertical = 8.dp))
 }
 
 @Composable
@@ -198,51 +217,33 @@ private fun CodeBlock(code: String) {
     }
 }
 
-@Composable
-internal fun Specimen(name: String, content: @Composable () -> Unit) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-    ) {
-        Text(name, style = CatalogMono, color = FeldPalette.Muted)
-        Spacer(Modifier.height(12.dp))
-        content()
-    }
-    FeldDivider()
+internal fun kotlinCall(name: String, vararg args: Pair<String, String?>): String = buildString {
+    append(name).append("(\n")
+    args.forEach { (key, value) -> if (value != null) append("    $key = $value,\n") }
+    append(")")
 }
 
-@Composable
-internal fun ControlSwitch(label: String, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(label.uppercase(), style = CatalogMono, color = FeldPalette.Cream, modifier = Modifier.weight(1f))
-        FeldSwitch(checked = checked, onCheckedChange = onChange)
-    }
-    FeldDivider()
-}
+internal fun String.quoted(): String = "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
+internal fun Float.fmt(digits: Int = 1): String = "%.${digits}f".format(this) + "f"
 
 @Composable
-internal fun ControlChoice(label: String, options: List<String>, selectedIndex: Int, onSelect: (Int) -> Unit) {
-    ControlField(label) {
-        FeldSegmentedControl(options = options, selectedIndex = selectedIndex, onSelect = onSelect)
+private fun UsageTab(usage: String?, notes: List<String>) {
+    if (usage != null) {
+        SectionLabel("Kotlin")
+        CodeBlock(usage)
+        Spacer(Modifier.height(28.dp))
+    }
+    if (notes.isNotEmpty()) {
+        SectionLabel("Notes")
+        notes.forEach {
+            Text(
+                "— $it",
+                style = MaterialTheme.typography.bodyMedium,
+                color = FeldPalette.Cream,
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
+        }
     }
 }
 
-@Composable
-internal fun ControlField(label: String, content: @Composable () -> Unit) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 14.dp),
-    ) {
-        Text(label.uppercase(), style = CatalogMono, color = FeldPalette.Muted)
-        Spacer(Modifier.height(8.dp))
-        content()
-    }
-    FeldDivider()
-}
