@@ -64,7 +64,9 @@ afterEvaluate {
         publications {
             register<MavenPublication>("release") {
                 from(components["release"])
-                artifactId = "designsystem"
+                groupId = "com.github.dasdasr"
+                artifactId = "feld-design"
+                version = "0.1.0"
             }
         }
     }

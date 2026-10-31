@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.feldelysium.designsystem.components.container.FeldDivider
 import com.feldelysium.designsystem.components.content.FeldIcon
 import com.feldelysium.designsystem.components.content.FeldIconId
+import com.feldelysium.designsystem.components.input.feldClickable
 import com.feldelysium.designsystem.foundation.material.FeldMarker
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
 
@@ -124,7 +125,7 @@ private fun RowScope.ToolbarCell(item: FeldToolbarItem) {
         modifier = Modifier
             .weight(weight)
             .fillMaxHeight()
-            .clickable(enabled = item.enabled, onClick = item.onClick)
+            .feldClickable(enabled = item.enabled, onClick = item.onClick)
             .padding(vertical = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,

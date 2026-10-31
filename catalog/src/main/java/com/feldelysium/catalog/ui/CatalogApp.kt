@@ -18,6 +18,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,28 +27,41 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.feldelysium.catalog.ui.feedback.FeedbackHub
+import com.feldelysium.catalog.ui.feedback.LocalFeedbackHub
 import com.feldelysium.designsystem.components.container.FeldCard
 import com.feldelysium.designsystem.components.container.FeldDivider
 import com.feldelysium.designsystem.components.container.FeldSectionHeader
 import com.feldelysium.designsystem.components.content.FeldDiamond
 import com.feldelysium.designsystem.components.content.FeldIconId
+import com.feldelysium.designsystem.foundation.sound.LocalFeldSounds
 import com.feldelysium.designsystem.theme.FeldPalette
 
 private const val HOME = "home"
 
 @Composable
 internal fun CatalogApp() {
-    var route by rememberSaveable { mutableStateOf(HOME) }
-    val homeScroll = rememberScrollState()
-    val entry = ShowcaseRegistry.firstOrNull { it.id == route }
+    val context = LocalContext.current
+    val hub = remember { FeedbackHub(context.applicationContext) }
+    DisposableEffect(hub) { onDispose { hub.release() } }
 
-    BackHandler(enabled = entry != null) { route = HOME }
+    CompositionLocalProvider(
+        LocalFeedbackHub provides hub,
+        LocalFeldSounds provides hub.sounds,
+    ) {
+        var route by rememberSaveable { mutableStateOf(HOME) }
+        val homeScroll = rememberScrollState()
+        val entry = ShowcaseRegistry.firstOrNull { it.id == route }
 
-    if (entry == null) {
-        CatalogHome(scroll = homeScroll, onOpen = { route = it })
-    } else {
-        entry.content { route = HOME }
+        BackHandler(enabled = entry != null) { route = HOME }
+
+        if (entry == null) {
+            CatalogHome(scroll = homeScroll, onOpen = { route = it })
+        } else {
+            entry.content { route = HOME }
+        }
     }
 }
 

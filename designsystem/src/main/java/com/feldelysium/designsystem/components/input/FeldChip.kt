@@ -261,12 +261,11 @@ public fun FeldChip(
                 scaleY = scale.value
             }
             .semantics { this.selected = selected }
-            .clickable(
+            .feldClickable(
+                onClick = onClick,
                 interactionSource = interaction,
-                indication = null,
                 enabled = enabled,
                 role = Role.Button,
-                onClick = onClick,
             )
             .padding(1.dp)
             .drawWithCache {

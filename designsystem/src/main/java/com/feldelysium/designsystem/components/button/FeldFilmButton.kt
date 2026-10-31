@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.feldelysium.designsystem.components.content.FeldIcon
 import com.feldelysium.designsystem.components.content.FeldIconId
+import com.feldelysium.designsystem.components.input.feldClickable
 import com.feldelysium.designsystem.foundation.haptics.rememberFeldHaptics
 import com.feldelysium.designsystem.foundation.material.ChipTexture
 import com.feldelysium.designsystem.foundation.material.ChipTextures
@@ -72,10 +73,14 @@ public fun FeldFilmButton(
                 translationY = 1.5f * press
             }
             .shadow(6.dp, RoundedCornerShape(4.dp), clip = false, ambientColor = Color.Black, spotColor = Color.Black)
-            .clickable(interactionSource = interaction, indication = null, role = Role.Button) {
-                haptics.tick()
-                onClick()
-            },
+            .feldClickable(
+                onClick = {
+                    haptics.tick()
+                    onClick()
+                },
+                interactionSource = interaction,
+                role = Role.Button,
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Canvas(Modifier.fillMaxSize().graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }) {

@@ -20,6 +20,7 @@ import com.feldelysium.designsystem.components.content.FeldIconId
 import com.feldelysium.designsystem.components.input.feldClickable
 import com.feldelysium.designsystem.foundation.material.FeldMarker
 import com.feldelysium.designsystem.foundation.material.MarkerFilmSpec
+import com.feldelysium.designsystem.foundation.sound.feldSounds
 import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 
@@ -33,14 +34,20 @@ public fun FeldIconButton(
     size: Dp = 24.dp,
     enabled: Boolean = true,
     markerFilmSpec: MarkerFilmSpec = FeldMarker.Chalk,
+    sound: Boolean = true,
 ) {
+    val sounds = feldSounds
+
     Box(
         modifier
             .sizeIn(minWidth = 40.dp, minHeight = 40.dp)
             .alpha(if (enabled) 1f else 0.6f)
             .feldClickable(
                 enabled = enabled,
-                onClick = onClick,
+                onClick = {
+                    if (sound) sounds.click()
+                    onClick()
+                },
                 role = Role.Button,
             ),
         contentAlignment = Alignment.Center,

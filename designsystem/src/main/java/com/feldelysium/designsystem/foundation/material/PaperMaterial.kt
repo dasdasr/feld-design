@@ -112,11 +112,29 @@ public object FeldPaper {
     )
 
     public val Field: PaperSpec = Note.copy(
-        wear = 0.2f,
-        edgeWear = 0.55f,
-        maxLoss = 0.4f,
-        inkWidth = 1.0.dp,
-        inkMinAlpha = 0.8f,
+        wear = 0.08f,
+        edgeWear = 0.25f,
+        edgeBand = 7.dp,
+        chipCoverage = 0.18f,
+        innerWear = 0.025f,
+        maxLoss = 0.22f,
+        scuffTint = 0.12f,
+
+        mottleSize = 38.dp,
+        mottleStrength = 0.07f,
+        grainSize = 0.7.dp,
+        grainStrength = 0.025f,
+        colorGrain = 0.004f,
+        toothStrength = 0.012f,
+        speckleStrength = 0.015f,
+
+        edgeShade = 0.035f,
+        pressShade = 0.06f,
+
+        inkWidth = 1.dp,
+        inkGrainSize = 32.dp,
+        inkMinAlpha = 0.92f,
+        inkContrast = 1.5f,
     )
 
     public val DryButtonCream: PaperSpec = PaperSpec(

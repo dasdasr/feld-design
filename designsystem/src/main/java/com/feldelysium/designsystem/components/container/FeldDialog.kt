@@ -39,6 +39,7 @@ import com.feldelysium.designsystem.foundation.decal.DecalSpec
 import com.feldelysium.designsystem.foundation.decal.FeldDecalType
 import com.feldelysium.designsystem.foundation.material.wornBrush
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
+import com.feldelysium.designsystem.foundation.sound.feldSounds
 import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 
@@ -55,8 +56,14 @@ public fun FeldDialog(
     footer: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val sounds = feldSounds
+    val dismiss = {
+        sounds.cancel()
+        onDismiss()
+    }
+
     Dialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = dismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         val view = LocalView.current
@@ -78,7 +85,7 @@ public fun FeldDialog(
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 0.dp),
             revealOnEnter = true,
         ) {
-            FeldDialogHeader(title, onDismiss, eyebrow, headerNote, seed)
+            FeldDialogHeader(title, dismiss, eyebrow, headerNote, seed)
 
             Column(
                 modifier = Modifier
@@ -108,7 +115,7 @@ private fun FeldDialogHeader(title: String, onDismiss: () -> Unit, eyebrow: Stri
     }
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            FeldIconButton(FeldIconId.Back, onDismiss)
+            FeldIconButton(FeldIconId.Back, onDismiss, sound = false)
             if (eyebrow != null) {
                 Text(
                     eyebrow.uppercase(),

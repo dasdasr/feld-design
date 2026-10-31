@@ -10,4 +10,6 @@ public object FeldPalette {
     public val Teal: Color = Color(0xFF4FB3A6)
     public val Ink: Color = Color(0xFF1B1612)
     public val Cream: Color = Color(0xFFDCCFB5)
+    public val Success: Color = Color(0xFF19BC6D)
+    public val Error: Color = Color(0xFFAF1E01)
 }

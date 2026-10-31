@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.feldelysium.designsystem.components.content.FeldIcon
 import com.feldelysium.designsystem.components.content.FeldIconId
 import com.feldelysium.designsystem.components.input.FeldRough
+import com.feldelysium.designsystem.components.input.feldClickable
 import com.feldelysium.designsystem.foundation.material.FeldMarker
 import com.feldelysium.designsystem.foundation.material.FeldPaper
 import com.feldelysium.designsystem.foundation.material.PaperSpec
@@ -57,12 +58,11 @@ public fun FeldFieldButton(
             .fillMaxWidth()
             .heightIn(min = minHeight)
             .paperMaterial(shape, spec, press = { press })
-            .clickable(
+            .feldClickable(
+                onClick = onClick,
                 interactionSource = interaction,
-                indication = null,
                 enabled = enabled,
                 role = Role.Button,
-                onClick = onClick,
             )
             .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,

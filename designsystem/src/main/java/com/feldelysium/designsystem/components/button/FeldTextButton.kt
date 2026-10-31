@@ -59,6 +59,7 @@ public fun FeldDialogActions(
     onCancel: (() -> Unit)? = null,
     confirmEnabled: Boolean = true,
     seed: Int = rememberSeed(),
+    destructive: Boolean = false,
 ) {
     val sounds = feldSounds
 
@@ -83,9 +84,10 @@ public fun FeldDialogActions(
         FeldButton(
             text = confirmLabel,
             onClick = {
-                sounds.click(seed)
+                if (destructive) sounds.delete() else sounds.save()
                 onConfirm()
             },
+            sound = false,
             enabled = confirmEnabled,
             spec = if (confirmEnabled) FeldButtonDefaults.OrangeFresh else FeldButtonDefaults.Cream,
             modifier = Modifier.weight(1f),

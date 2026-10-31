@@ -10,6 +10,7 @@ import com.feldelysium.catalog.ui.pages.InputShowcase
 import com.feldelysium.catalog.ui.pages.NavigationShowcase
 import com.feldelysium.catalog.ui.pages.PaperShowcase
 import com.feldelysium.catalog.ui.pages.SettingsShowcase
+import com.feldelysium.catalog.ui.pages.SoundHapticsShowcase
 import com.feldelysium.catalog.ui.pages.TypographyShowcase
 
 internal enum class ShowcaseGroup(val title: String) {
@@ -29,6 +30,7 @@ internal val ShowcaseRegistry = listOf(
     ShowcaseEntry("colors", "Colors", "Palette and theme roles", ShowcaseGroup.Foundations) { ColorsShowcase(it) },
     ShowcaseEntry("typography", "Typography", "The type scale, live", ShowcaseGroup.Foundations) { TypographyShowcase(it) },
     ShowcaseEntry("paper", "Paper", "Surfaces and rough edges", ShowcaseGroup.Foundations) { PaperShowcase(it) },
+    ShowcaseEntry("sound", "Sound & Haptics", "Feedback for every press", ShowcaseGroup.Foundations) { SoundHapticsShowcase(it) },
     ShowcaseEntry("buttons", "Buttons", "Press, tilt and tear", ShowcaseGroup.Components) { ButtonsShowcase(it) },
     ShowcaseEntry("input", "Input", "Fields, chips, sliders, menus", ShowcaseGroup.Components) { InputShowcase(it) },
     ShowcaseEntry("containers", "Containers", "Cards, boxes, dividers, toasts", ShowcaseGroup.Components) { ContainersShowcase(it) },
