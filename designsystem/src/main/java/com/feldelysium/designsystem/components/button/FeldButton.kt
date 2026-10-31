@@ -34,16 +34,16 @@ import androidx.compose.ui.unit.sp
 import com.feldelysium.designsystem.foundation.material.DryPaperSpec
 import com.feldelysium.designsystem.foundation.material.dryPaperMaterial
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
+import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 
+/** Paper specs for [FeldButton]: [Cream], [Orange] and [OrangeFresh]. */
 public object FeldButtonDefaults {
     internal val ContentPadding = PaddingValues(horizontal = 40.dp, vertical = 18.dp)
     internal val MinHeight = 56.dp
-    internal val InkDark = Color(0xFF1B1612)
 
-    public val Cream: DryPaperSpec = DryPaperSpec(base = Color(0xFFDCCFB5), crack = Color(0xFF5E4F38))
-    public val Orange: DryPaperSpec = DryPaperSpec(base = Color(0xFFDD6224), crack = Color(0xFF6B2A0C))
-
+    public val Cream: DryPaperSpec = DryPaperSpec(base = FeldPalette.Cream, crack = Color(0xFF5E4F38))
+    public val Orange: DryPaperSpec = DryPaperSpec(base = FeldPalette.Orange, crack = Color(0xFF6B2A0C))
     public val OrangeFresh: DryPaperSpec = DryPaperSpec(
         base = Color(0xFFDB6A2C), crack = Color(0xFF7A3414),
         tearDepth = 1.1.dp, tearScale = 16.dp, tearCoverage = 0.22f, bow = 0.3.dp,
@@ -54,6 +54,7 @@ public object FeldButtonDefaults {
     )
 }
 
+/** A wide dry-paper button with an uppercase label that presses down on touch. */
 @Composable
 public fun FeldButton(
     text: String,
@@ -61,7 +62,7 @@ public fun FeldButton(
     modifier: Modifier = Modifier,
     seed: Int = rememberSeed(),
     spec: DryPaperSpec = FeldButtonDefaults.Cream,
-    contentColor: Color = FeldButtonDefaults.InkDark,
+    contentColor: Color = FeldPalette.Ink,
     textStyle: TextStyle = MaterialTheme.typography.labelLarge.copy(
         letterSpacing = 1.6.sp,
         fontSize = 18.sp,
@@ -139,7 +140,7 @@ private fun FeldButtonPreview() {
                 FeldButton("Cancel", {}, Modifier.weight(1f), seed = 21)
             }
             FeldButton(
-                "Delete line",
+                "Delete one",
                 {},
                 Modifier.fillMaxWidth(),
                 seed = 3,
@@ -148,99 +149,6 @@ private fun FeldButtonPreview() {
                 contentAlignment = Alignment.CenterStart,
                 contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
             )
-        }
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF111819)
-@Composable
-private fun FeldDialogActionsPreview() {
-    FeldTheme {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            FeldDialogActions(
-                confirmLabel = "Save entry",
-                onConfirm = {},
-                onCancel = {},
-                seed = 1,
-                cancelLabel = "Cancel",
-            )
-
-            FeldDialogActions(
-                confirmLabel = "Create speaker",
-                onConfirm = {},
-                cancelLabel = "Back",
-                onCancel = {},
-                seed = 2,
-            )
-
-            FeldDialogActions(
-                confirmLabel = "Import",
-                onConfirm = {},
-                onCancel = {},
-                confirmEnabled = false,
-                seed = 3,
-                cancelLabel = "Cancel",
-            )
-
-            FeldDialogActions(
-                confirmLabel = "Delete",
-                onConfirm = {},
-                cancelLabel = "Keep",
-                onCancel = {},
-                seed = 4,
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF111819)
-@Composable
-private fun FeldTextButtonPreview() {
-    FeldTheme {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            FeldTextButton(text = "Cancel", onClick = {})
-            FeldTextButton(text = "Discard changes", onClick = {})
-            FeldTextButton(text = "Back to editing", onClick = {})
-        }
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF111819)
-@Composable
-private fun FeldLabeledBlockPreview() {
-    FeldTheme {
-        Column(Modifier.padding(horizontal = 16.dp)) {
-            FeldLabeledBlock(
-                label = "IDENTIFICATION",
-                seed = 7,
-            ) {
-                Text(
-                    text = "Give this voice a name.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                FeldTextButton(
-                    text = "Choose voice",
-                    onClick = {},
-                )
-            }
-
-            FeldLabeledBlock(
-                label = "PERSONALITY",
-                seed = 12,
-            ) {
-                Text(
-                    text = "A little theatrical. Difficult to ignore.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-            }
         }
     }
 }

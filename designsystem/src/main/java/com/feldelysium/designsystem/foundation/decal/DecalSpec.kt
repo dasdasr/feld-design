@@ -54,7 +54,7 @@ public data class DecalSpec(
     val leakColor: Color = FeldPalette.Orange,
 ) {
     public companion object {
-        public val Entry: DecalSpec = DecalSpec(
+        public val Note: DecalSpec = DecalSpec(
             weights = mapOf(
                 DecalKind.Ruler to 0.6f,
                 DecalKind.Text to 3f,

@@ -22,10 +22,12 @@ import com.feldelysium.designsystem.foundation.material.FeldTape
 import com.feldelysium.designsystem.foundation.material.distressMaterial
 import com.feldelysium.designsystem.foundation.material.stickerTapeMaterial
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
+import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 
 private val DistressPad = 3.dp
 
+/** An uppercase title with worn, scratched ink. */
 @Composable
 public fun FeldDistressedTitle(
     text: String,
@@ -61,7 +63,7 @@ public fun FeldDistressedTitle(
 public object FeldDistressedTitles {
 
     public val Small: DistressSpec = DistressSpec(
-        color = Color(0xFF1B1612),
+        color = FeldPalette.Ink,
         edgeSoftness = 0.5.dp, edgeRough = 0.3.dp, edgeSize = 1.6.dp,
         edgeErode = 0.5f, bleed = 0.12f,
         patchy = 0.18f, patchSize = 30.dp,

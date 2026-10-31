@@ -22,7 +22,6 @@
     <ID>MatchingDeclarationName:FeldIcon.kt:FeldIconId</ID>
     <ID>MatchingDeclarationName:FeldMenu.kt:FeldMenuItem</ID>
     <ID>MatchingDeclarationName:FeldTextField.kt:FeldRough</ID>
-    <ID>MatchingDeclarationName:FeldTheme.kt:DiscoExtraColors</ID>
     <ID>MatchingDeclarationName:FeldToast.kt:FeldToastState</ID>
     <ID>MatchingDeclarationName:FeldToolbar.kt:FeldToolbarItem</ID>
     <ID>ReturnCount:DecalPlanner.kt:internal fun planDecals: DecalPlan</ID>

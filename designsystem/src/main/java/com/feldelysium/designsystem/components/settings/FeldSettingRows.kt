@@ -34,6 +34,7 @@ public enum class FeldSettingStatus {
     LOCK,
 }
 
+/** A settings row with icon, title and subtitle; the SOON and LOCK statuses disable it. */
 @Composable
 public fun FeldSettingRow(
     icon: FeldIconId,
@@ -106,6 +107,7 @@ public fun FeldSettingRow(
     }
 }
 
+/** A settings row with a [FeldSwitch]. */
 @Composable
 public fun FeldSettingValueRow(
     icon: FeldIconId,

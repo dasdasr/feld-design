@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.detekt)
+    id("maven-publish")
 }
 
 android {
@@ -25,6 +26,12 @@ android {
     lint {
         abortOnError = true
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 }
 
 kotlin {
@@ -40,12 +47,25 @@ detekt {
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
+    api(platform(libs.androidx.compose.bom))
+
+    api(libs.androidx.compose.ui)
+    api(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.animation.core)
+    api(libs.androidx.compose.material3)
+    api(libs.androidx.compose.animation.core)
+
     debugImplementation(libs.androidx.compose.ui.tooling)
     detektPlugins(libs.detekt.rules.ktlint.wrapper)
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            register<MavenPublication>("release") {
+                from(components["release"])
+                artifactId = "designsystem"
+            }
+        }
+    }
 }

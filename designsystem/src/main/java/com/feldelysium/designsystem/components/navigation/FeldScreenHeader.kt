@@ -23,16 +23,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.feldelysium.designsystem.components.button.FeldIconButton
 import com.feldelysium.designsystem.components.container.FeldDivider
-import com.feldelysium.designsystem.components.content.FeldDiamond
 import com.feldelysium.designsystem.components.content.FeldDistressedTitle
 import com.feldelysium.designsystem.components.content.FeldDistressedTitles
 import com.feldelysium.designsystem.components.content.FeldIconId
+import com.feldelysium.designsystem.components.content.FlatDiamond
 import com.feldelysium.designsystem.components.input.feldClickable
 import com.feldelysium.designsystem.foundation.haptics.rememberFeldHaptics
 import com.feldelysium.designsystem.foundation.material.DistressSpec
 import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 
+/** A section title on a tape tag sitting over a divider. */
 @Composable
 public fun FeldScreenHeader(
     title: String,
@@ -83,7 +84,7 @@ public fun FeldScreenHeader(
                             onDiamondClick?.invoke()
                         }),
                     contentAlignment = Alignment.Center,
-                ) { FeldDiamond(FeldPalette.Orange, size = 10.dp) }
+                ) { FlatDiamond(FeldPalette.Orange, size = 10.dp) }
                 Text(
                     text = eyebrow.uppercase(),
                     style = MaterialTheme.typography.labelSmall,

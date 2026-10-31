@@ -44,6 +44,7 @@ import com.feldelysium.designsystem.foundation.material.ChipTextures
 import com.feldelysium.designsystem.foundation.material.FeldMarker
 import com.feldelysium.designsystem.foundation.material.markerFilmMaterial
 
+/** An orange button with film-strip perforations. */
 @Composable
 public fun FeldFilmButton(
     text: String,

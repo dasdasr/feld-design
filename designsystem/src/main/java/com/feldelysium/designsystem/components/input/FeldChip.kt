@@ -184,6 +184,7 @@ private fun buildReveal(
     }
 }
 
+/** A toggle chip that fills outward from the touch point. */
 @Composable
 public fun FeldChip(
     text: String,

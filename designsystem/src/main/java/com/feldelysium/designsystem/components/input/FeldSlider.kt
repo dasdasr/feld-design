@@ -57,6 +57,7 @@ import kotlin.math.abs
 
 private val OffColor = Color(0xFF1F2322)
 
+/** A slider with a textured track and a choice of thumb shapes. */
 @Composable
 public fun FeldSlider(
     value: Float,
@@ -84,13 +85,18 @@ public fun FeldSlider(
     val fraction = ((value - valueRange.start) / span).coerceIn(0f, 1f)
     val fractionState = rememberUpdatedState(fraction)
 
+    var dragFraction by remember { mutableFloatStateOf(-1f) }
+    val shownFraction: () -> Float = { if (dragFraction >= 0f) dragFraction else fractionState.value }
+
     val thumbDp = thumb.size()
     val thumbW = with(density) { thumbDp.width.toPx() }
 
     Column(modifier.fillMaxWidth()) {
         if (label != null || valueText != null) {
             Row(
-                Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text((label ?: "").uppercase(), style = MaterialTheme.typography.labelMedium, color = FeldPalette.Muted)
@@ -108,7 +114,7 @@ public fun FeldSlider(
                 .semantics {
                     progressBarRangeInfo = ProgressBarRangeInfo(value, valueRange)
                     setProgress { v ->
-                        onValueChange(v.coerceIn(valueRange))
+                        currentOnChange(v.coerceIn(valueRange))
                         true
                     }
                 }
@@ -116,11 +122,16 @@ public fun FeldSlider(
                     awaitEachGesture {
                         val down = awaitFirstDown(requireUnconsumed = false)
                         pressed = true
-                        var drag = false
+
+                        val usable = (widthPx - thumbW).coerceAtLeast(1f)
+                        val thumbCenter = thumbW / 2f + fractionState.value * usable
+                        val onThumb = abs(down.position.x - thumbCenter) <= thumbW
+                        val grab = if (onThumb) down.position.x - thumbCenter else 0f
+                        var drag = onThumb
 
                         fun setFromX(x: Float) {
-                            val usable = (widthPx - thumbW).coerceAtLeast(1f)
-                            val f = ((x - thumbW / 2f) / usable).coerceIn(0f, 1f)
+                            val f = ((x - grab - thumbW / 2f) / usable).coerceIn(0f, 1f)
+                            dragFraction = f
                             currentOnChange(valueRange.start + f * span)
                         }
 
@@ -132,13 +143,18 @@ public fun FeldSlider(
                                 if (!drag) setFromX(c.position.x)
                                 break
                             }
-                            if (!drag && abs(c.position.x - down.position.x) > viewConfiguration.touchSlop) drag = true
+                            if (!drag) {
+                                val dx = abs(c.position.x - down.position.x)
+                                val dy = abs(c.position.y - down.position.y)
+                                if (dx > viewConfiguration.touchSlop / 2f && dx > dy) drag = true
+                            }
                             if (drag) {
                                 setFromX(c.position.x)
                                 c.consume()
                             }
                         }
                         pressed = false
+                        dragFraction = -1f
                         currentFinished?.invoke()
                     }
                 },
@@ -148,14 +164,14 @@ public fun FeldSlider(
                 Modifier
                     .fillMaxWidth()
                     .height(trackHeight)
-                    .sliderTrack(accent, OffColor, seed, thumbW) { fractionState.value },
+                    .sliderTrack(accent, OffColor, seed, thumbW) { shownFraction() },
             )
 
             Box(
                 Modifier
                     .size(thumbDp)
                     .graphicsLayer {
-                        translationX = fractionState.value * (widthPx - thumbW).coerceAtLeast(0f)
+                        translationX = shownFraction() * (widthPx - thumbW).coerceAtLeast(0f)
                         val s = 1f + 0.12f * pressState.value
                         scaleX = s
                         scaleY = s

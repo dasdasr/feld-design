@@ -49,6 +49,7 @@ private val FeldColorScheme = darkColorScheme(
     surfaceContainerHighest = FeldSurfaceHigh,
 )
 
+/** Applies the Feld color scheme and typography. Dark only. */
 @Composable
 public fun FeldTheme(content: @Composable () -> Unit) {
     MaterialTheme(

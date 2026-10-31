@@ -61,6 +61,7 @@ public enum class FeldFabVariant {
     Rec,
 }
 
+/** A round or film-style floating action button in Film, Marker or Rec variant. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 public fun FeldFab(

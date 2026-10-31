@@ -20,9 +20,10 @@ import com.feldelysium.designsystem.foundation.material.FeldTape
 import com.feldelysium.designsystem.foundation.material.StickerTapeSpec
 import com.feldelysium.designsystem.foundation.material.stickerTapeMaterial
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
+import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 
-public val CompactCream: StickerTapeSpec = FeldTape.Cream.copy(
+internal val CompactCream: StickerTapeSpec = FeldTape.Cream.copy(
     tearAmp = 4.dp,
     tearScale = 16.dp,
     slantLeft = 9.dp,
@@ -36,13 +37,14 @@ public val CompactCream: StickerTapeSpec = FeldTape.Cream.copy(
     layerScale = 11.dp,
 )
 
+/** Text on a strip of sticker tape. */
 @Composable
 public fun FeldTitleTag(
     text: String,
     modifier: Modifier = Modifier,
     seed: Int = rememberSeed(),
     spec: StickerTapeSpec = CompactCream,
-    contentColor: Color = Color(0xFF1B1612),
+    contentColor: Color = FeldPalette.Ink,
     textStyle: TextStyle = MaterialTheme.typography.titleMedium.copy(
         letterSpacing = 0.4.sp,
     ),
@@ -81,10 +83,10 @@ public fun FeldTitleTag(
 private fun FeldTitleTagPreview() {
     FeldTheme {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            FeldTitleTag("Choose speaker", seed = 1)
-            FeldTitleTag("Choose speaker", seed = 1, distressed = true)
+            FeldTitleTag("Section settings", seed = 1)
+            FeldTitleTag("Section settings", seed = 1, distressed = true)
             FeldTitleTag("Background settings", seed = 2, distressed = true)
-            FeldTitleTag("Entry edit", seed = 14, distressed = true)
+            FeldTitleTag("Edit details", seed = 14, distressed = true)
         }
     }
 }

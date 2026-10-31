@@ -24,47 +24,45 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.feldelysium.designsystem.components.container.FeldHandDiamond
-import com.feldelysium.designsystem.components.container.entryRough
+import com.feldelysium.designsystem.components.container.HandDiamond
+import com.feldelysium.designsystem.components.container.noteRough
 import com.feldelysium.designsystem.foundation.material.FeldPaper
 import com.feldelysium.designsystem.foundation.material.PaperSpec
 import com.feldelysium.designsystem.foundation.material.paperMaterial
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
 import com.feldelysium.designsystem.foundation.shape.RoughShape
 import com.feldelysium.designsystem.foundation.sound.feldSounds
+import com.feldelysium.designsystem.theme.FeldPalette
 
-private val Cream = Color(0xFFE6DCC4)
-private val InkDark = Color(0xFF1B1612)
+internal fun swatchSpec(c: Color): PaperSpec = FeldPaper.DryButtonCream.copy(
+    base = c,
+    scuff = lerp(c, Color.Black, 0.35f),
+    ink = FeldPalette.Cream,
+    inkWidth = 0.dp,
 
-public fun swatchSpec(argb: Long): PaperSpec {
-    val c = Color(argb.toInt())
-    return FeldPaper.DryButtonCream.copy(
-        base = c,
-        scuff = lerp(c, Color.Black, 0.35f),
-        ink = Cream,
-        inkWidth = 0.dp,
+    wear = 0.4f,
+    edgeWear = 0.2f,
+    innerWear = 0.3f,
+    scuffTint = 0.35f,
+    chipSize = 5.dp,
+    chipCoverage = 0.5f,
 
-        wear = 0.4f,
-        edgeWear = 0.2f,
-        innerWear = 0.3f,
-        scuffTint = 0.35f,
-        chipSize = 5.dp,
-        chipCoverage = 0.5f,
+    mottleStrength = 0.3f,
+    grainStrength = 0.03f,
+    toothStrength = 0.03f,
+    speckleStrength = 0.03f,
+)
 
-        mottleStrength = 0.3f,
-        grainStrength = 0.03f,
-        toothStrength = 0.03f,
-        speckleStrength = 0.03f,
-    )
-}
-
+/** A grid of color swatches; the selected one shows a diamond. */
 @Composable
 public fun FeldColorSwatches(
-    colors: List<Long>,
-    selected: Long,
-    onSelect: (Long) -> Unit,
+    colors: List<Color>,
+    selected: Color,
+    onSelect: (Color) -> Unit,
     modifier: Modifier = Modifier,
     seed: Int = rememberSeed(),
     columns: Int = colors.size.coerceAtLeast(1),
@@ -88,8 +86,8 @@ public fun FeldColorSwatches(
                 horizontalArrangement = Arrangement.spacedBy(horizontalSpacing),
             ) {
                 repeat(cols) { c ->
-                    val argb = rowColors.getOrNull(c)
-                    if (argb == null) {
+                    val color = rowColors.getOrNull(c)
+                    if (color == null) {
                         Spacer(
                             Modifier
                                 .weight(1f)
@@ -97,10 +95,10 @@ public fun FeldColorSwatches(
                         )
                     } else {
                         Swatch(
-                            argb = argb,
-                            selected = argb == selected,
+                            color = color,
+                            selected = color == selected,
                             seed = seed + (r * cols + c) * 5,
-                            onClick = { onSelect(argb) },
+                            onClick = { onSelect(color) },
                             diamondFraction = diamondFraction,
                             modifier = Modifier.weight(1f),
                         )
@@ -113,7 +111,7 @@ public fun FeldColorSwatches(
 
 @Composable
 private fun Swatch(
-    argb: Long,
+    color: Color,
     selected: Boolean,
     seed: Int,
     onClick: () -> Unit,
@@ -123,7 +121,7 @@ private fun Swatch(
     val shape = remember(seed) {
         RoughShape(
             seed = seed,
-            style = entryRough(seed).copy(
+            style = noteRough(seed).copy(
                 corner = 4.dp,
                 cornerJitter = 0.15f,
                 tornChance = 0.03f,
@@ -131,8 +129,7 @@ private fun Swatch(
             ),
         )
     }
-    val spec = remember(argb) { swatchSpec(argb) }
-    val color = Color(argb.toInt())
+    val spec = remember(color) { swatchSpec(color) }
     val t by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
         animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium),
@@ -157,6 +154,7 @@ private fun Swatch(
                 rotationZ = -3f * t
             }
             .paperMaterial(shape, spec)
+            .semantics { this.selected = selected }
             .feldClickable(
                 role = Role.RadioButton,
                 onClick = {
@@ -167,11 +165,10 @@ private fun Swatch(
         contentAlignment = Alignment.Center,
     ) {
         if (t > 0.01f) {
-            FeldHandDiamond(
-                color = if (color.luminance() > 0.55f) InkDark else Cream,
+            HandDiamond(
+                color = if (color.luminance() > 0.55f) FeldPalette.Ink else FeldPalette.Cream,
                 seed = seed,
-                size = (swatchSize * diamondFraction.coerceIn(0f, 1f))
-                    .coerceAtLeast(0.dp),
+                size = (swatchSize * diamondFraction.coerceIn(0f, 1f)).coerceAtLeast(0.dp),
                 modifier = Modifier.graphicsLayer {
                     alpha = t
                 },

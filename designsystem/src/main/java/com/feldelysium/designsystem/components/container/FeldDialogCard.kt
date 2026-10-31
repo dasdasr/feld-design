@@ -41,7 +41,7 @@ internal fun FeldDialogCard(
     seed: Int = rememberSeed(),
     tagSeed: Int = seed + 1,
     spec: PaperSpec = FeldPaper.Panel,
-    rough: RoughStyle = entryRough(seed),
+    rough: RoughStyle = noteRough(seed),
     tapeSpec: StickerTapeSpec = FeldTape.Cream,
     contentPadding: PaddingValues = PaddingValues(start = 18.dp, end = 18.dp, bottom = 18.dp),
     tagStart: Dp = 6.dp,

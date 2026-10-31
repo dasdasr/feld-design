@@ -46,6 +46,7 @@ private val MenuRough = RoughStyle(
     jerkChance = 0.04f,
 )
 
+/** A dropdown menu on paper. */
 @Composable
 public fun FeldMenu(
     expanded: Boolean,

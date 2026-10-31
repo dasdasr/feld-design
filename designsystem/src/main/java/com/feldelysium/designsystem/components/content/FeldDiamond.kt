@@ -33,13 +33,9 @@ private fun diamondSpec(color: Color) = DryPaperSpec(
     mottleStrength = 0.22f,
 )
 
+/** A dry-paper diamond of the given color. */
 @Composable
-public fun FeldSpeakerDiamond(
-    color: Color,
-    modifier: Modifier = Modifier,
-    size: Dp = 32.dp,
-    seed: Int = rememberSeed(),
-) {
+public fun FeldDiamond(color: Color, modifier: Modifier = Modifier, size: Dp = 32.dp, seed: Int = rememberSeed()) {
     val spec = remember(color) { diamondSpec(color) }
     Box(modifier.size(size), contentAlignment = Alignment.Center) {
         Box(
