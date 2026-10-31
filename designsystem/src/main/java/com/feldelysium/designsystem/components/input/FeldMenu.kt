@@ -71,10 +71,12 @@ public fun FeldMenu(
         wasExpanded = expanded
         when {
             expanded -> {
-                picked = false; sounds.menuOpen()
+                picked = false
+                sounds.menuOpen()
             }
 
             picked -> picked = false
+
             else -> sounds.menuClose()
         }
     }
@@ -128,7 +130,8 @@ private fun MenuRow(item: FeldMenuItem, seed: Int, onDismiss: () -> Unit, onPick
         Box(
             Modifier
                 .size(20.dp)
-                .padding(bottom = 2.dp), contentAlignment = Alignment.Center
+                .padding(bottom = 2.dp),
+            contentAlignment = Alignment.Center,
         ) {
             if (item.icon != null) {
                 FeldIcon(id = item.icon, seed = seed, size = 18.dp, film = false)

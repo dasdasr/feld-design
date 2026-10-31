@@ -58,7 +58,9 @@ public fun FeldSettingRow(
             if (sound) sounds.select()
             onClick()
         })
-    } else Modifier
+    } else {
+        Modifier
+    }
 
     Row(
         modifier = modifier

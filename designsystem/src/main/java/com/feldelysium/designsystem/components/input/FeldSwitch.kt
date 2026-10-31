@@ -198,8 +198,11 @@ public fun FeldSwitch(
                             settle(tracker.calculateVelocity().x / travelPx)
                         } else {
                             haptics.confirm()
-                            if (currentChecked) sounds.switchOff(seed + 1)
-                            else sounds.switchOn(seed + 1)
+                            if (currentChecked) {
+                                sounds.switchOff(seed + 1)
+                            } else {
+                                sounds.switchOn(seed + 1)
+                            }
                             currentOnChange(!currentChecked)
                         }
                         finished = true
@@ -217,8 +220,11 @@ public fun FeldSwitch(
                             val new = (old + dx / travelPx).coerceIn(0f, 1f)
                             if ((old < 0.5f) != (new < 0.5f)) {
                                 haptics.tick()
-                                if (new < 0.5f) sounds.switchOn(seed)
-                                else sounds.switchOff(seed)
+                                if (new < 0.5f) {
+                                    sounds.switchOn(seed)
+                                } else {
+                                    sounds.switchOff(seed)
+                                }
                             }
                             scope.launch(start = CoroutineStart.UNDISPATCHED) { pos.snapTo(new) }
                         }
@@ -272,8 +278,11 @@ public fun FeldSwitch(
                 role = Role.Switch
                 toggleableState = ToggleableState(checked)
                 onClick {
-                    if (checked) sounds.switchOff(seed)
-                    else sounds.switchOn(seed)
+                    if (checked) {
+                        sounds.switchOff(seed)
+                    } else {
+                        sounds.switchOn(seed)
+                    }
 
                     onCheckedChange(!checked)
                     true

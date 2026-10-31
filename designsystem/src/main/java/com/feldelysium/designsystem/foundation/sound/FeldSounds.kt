@@ -5,6 +5,7 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 
+@Suppress("TooManyFunctions")
 public interface FeldSounds {
     public fun click(seed: Int = 0)
     public fun select()
