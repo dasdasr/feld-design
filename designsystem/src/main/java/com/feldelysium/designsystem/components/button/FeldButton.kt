@@ -2,7 +2,6 @@ package com.feldelysium.designsystem.components.button
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -31,9 +30,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.feldelysium.designsystem.components.input.feldClickable
 import com.feldelysium.designsystem.foundation.material.DryPaperSpec
 import com.feldelysium.designsystem.foundation.material.dryPaperMaterial
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
+import com.feldelysium.designsystem.foundation.sound.feldSounds
 import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 
@@ -77,9 +78,11 @@ public fun FeldButton(
     pressScale: Float = 0.015f,
     pressShift: Dp = 1.5.dp,
     pressMillis: Int = 0,
+    sound: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
+    val sounds = feldSounds
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val press by animateFloatAsState(
@@ -98,12 +101,14 @@ public fun FeldButton(
                 alpha = if (enabled) 1f else 0.5f
             }
             .dryPaperMaterial(spec = spec, seed = seed, press = { press })
-            .clickable(
-                interactionSource = interaction,
-                indication = null,
+            .feldClickable(
+                onClick = {
+                    if (sound) sounds.click(seed)
+                    onClick()
+                },
                 enabled = enabled,
+                interactionSource = interaction,
                 role = Role.Button,
-                onClick = onClick,
             )
             .defaultMinSize(minWidth = minWidth, minHeight = minHeight)
             .padding(contentPadding),

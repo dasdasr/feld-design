@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
@@ -38,8 +39,10 @@ import com.feldelysium.designsystem.components.button.FeldTextButton
 import com.feldelysium.designsystem.components.container.FeldDivider
 import com.feldelysium.designsystem.components.content.FeldIconId
 import com.feldelysium.designsystem.components.input.FeldChip
+import com.feldelysium.designsystem.components.input.FeldChipShape
 import com.feldelysium.designsystem.components.input.FeldSegmentedControl
 import com.feldelysium.designsystem.components.input.FeldSwitch
+import com.feldelysium.designsystem.components.input.feldClickable
 import com.feldelysium.designsystem.components.navigation.FeldScreenHeader
 import com.feldelysium.designsystem.theme.FeldPalette
 
@@ -55,8 +58,10 @@ internal class ShowcaseSpec(
     val code: () -> String,
     val variants: (@Composable ColumnScope.() -> Unit)? = null,
     val variantsLabel: String = "Variants",
+    val controlsLabel: String = "Controls",
     val notes: List<String> = emptyList(),
     val textured: Boolean = false,
+    val onTab: (Int) -> Unit = {},
 )
 
 /** A component showcased within a group page. */
@@ -97,12 +102,19 @@ internal fun ShowcaseScreen(
                 add(Tab.Code)
             }
             val tab = tabs[tabIndex.coerceIn(tabs.indices)]
+            LaunchedEffect(tab) { spec.onTab(tabs.indexOf(tab)) }
 
             Stage(spec.textured, seed, onReroll = { seed += 1 }, content = spec.preview)
 
             Box(Modifier.padding(horizontal = 20.dp, vertical = 14.dp)) {
                 FeldSegmentedControl(
-                    options = tabs.map { if (it == Tab.Variants) spec.variantsLabel else it.name },
+                    options = tabs.map {
+                        when (it) {
+                            Tab.Controls -> spec.controlsLabel
+                            Tab.Variants -> spec.variantsLabel
+                            Tab.Code -> "Code"
+                        }
+                    },
                     selectedIndex = tabs.indexOf(tab),
                     onSelect = { tabIndex = it },
                 )
@@ -134,10 +146,10 @@ private fun SubjectPicker(names: List<String>, selected: Int, onSelect: (Int) ->
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         names.forEachIndexed { i, name ->
-            FeldChip(text = name, selected = i == selected, onClick = { onSelect(i) })
+            FeldChip(text = name, selected = i == selected, onClick = { onSelect(i) }, shape = FeldChipShape.Rectangle)
         }
     }
 }
@@ -162,7 +174,7 @@ private fun Stage(textured: Boolean, seed: Int, onReroll: () -> Unit, content: @
                     style = CatalogMono,
                     color = FeldPalette.Cream,
                     modifier = Modifier
-                        .clickable(onClick = onReroll)
+                        .feldClickable(onClick = onReroll)
                         .padding(horizontal = 20.dp, vertical = 14.dp),
                 )
             }

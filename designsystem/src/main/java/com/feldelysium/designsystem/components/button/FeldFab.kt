@@ -50,6 +50,7 @@ import com.feldelysium.designsystem.foundation.material.FeldMarker
 import com.feldelysium.designsystem.foundation.material.accentBrush
 import com.feldelysium.designsystem.foundation.material.markerFilmMaterial
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
+import com.feldelysium.designsystem.foundation.sound.feldSounds
 import com.feldelysium.designsystem.theme.FeldTheme
 import kotlin.math.PI
 import kotlin.math.cos
@@ -68,6 +69,7 @@ public fun FeldFab(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     seed: Int = rememberSeed(),
+    sound: Boolean = true,
     size: Dp = 56.dp,
     contentDescription: String? = null,
     onLongClick: (() -> Unit)? = null,
@@ -75,6 +77,8 @@ public fun FeldFab(
     content: (@Composable () -> Unit)? = null,
 ) {
     val haptics = rememberFeldHaptics()
+    val sounds = feldSounds
+
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val press by animateFloatAsState(
@@ -126,6 +130,7 @@ public fun FeldFab(
                 role = Role.Button,
                 onClick = {
                     haptics.tick()
+                    if (sound) sounds.click(seed)
                     onClick()
                 },
                 onLongClick = onLongClick?.let { longClick ->

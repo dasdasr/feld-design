@@ -26,6 +26,7 @@ import com.feldelysium.designsystem.components.content.FeldIconId
 import com.feldelysium.designsystem.components.input.FeldSwitch
 import com.feldelysium.designsystem.components.input.feldClickable
 import com.feldelysium.designsystem.foundation.seed.rememberSeed
+import com.feldelysium.designsystem.foundation.sound.feldSounds
 import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 
@@ -47,10 +48,16 @@ public fun FeldSettingRow(
     onClick: (() -> Unit)? = null,
     contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
     trailing: (@Composable () -> Unit)? = null,
+    sound: Boolean = true,
 ) {
+    val sounds = feldSounds
     val enabled = status == null
+
     val clickable = if (enabled && onClick != null) {
-        Modifier.feldClickable(role = role, onClick = onClick)
+        Modifier.feldClickable(role = role, onClick = {
+            if (sound) sounds.select()
+            onClick()
+        })
     } else {
         Modifier
     }

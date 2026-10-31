@@ -4,7 +4,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -261,12 +260,11 @@ public fun FeldChip(
                 scaleY = scale.value
             }
             .semantics { this.selected = selected }
-            .clickable(
+            .feldClickable(
+                onClick = onClick,
                 interactionSource = interaction,
-                indication = null,
                 enabled = enabled,
                 role = Role.Button,
-                onClick = onClick,
             )
             .padding(1.dp)
             .drawWithCache {

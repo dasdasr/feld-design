@@ -5,6 +5,7 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 
+@Suppress("TooManyFunctions")
 public interface FeldSounds {
     public fun click(seed: Int = 0)
     public fun select()
@@ -13,6 +14,13 @@ public interface FeldSounds {
     public fun save()
     public fun delete()
     public fun tab(seed: Int = 0)
+
+    public fun switchOn(seed: Int = 0): Unit = toggle(seed)
+    public fun switchOff(seed: Int = 0): Unit = toggle(seed)
+    public fun menuOpen(): Unit = Unit
+    public fun menuClose(): Unit = Unit
+    public fun menuSelect(): Unit = select()
+    public fun tick(): Unit = Unit
 }
 
 internal object NoFeldSounds : FeldSounds {

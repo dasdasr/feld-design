@@ -12,7 +12,11 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +31,7 @@ import com.feldelysium.designsystem.foundation.material.FeldPaper
 import com.feldelysium.designsystem.foundation.material.paperMaterial
 import com.feldelysium.designsystem.foundation.shape.RoughShape
 import com.feldelysium.designsystem.foundation.shape.RoughStyle
+import com.feldelysium.designsystem.foundation.sound.feldSounds
 import com.feldelysium.designsystem.theme.FeldPalette
 
 public data class FeldMenuItem(
@@ -57,6 +62,25 @@ public fun FeldMenu(
     offset: DpOffset = DpOffset(12.dp, 0.dp),
 ) {
     val shape = remember(seed) { RoughShape(seed, MenuRough) }
+    val sounds = feldSounds
+    var picked by remember { mutableStateOf(false) }
+    var wasExpanded by remember { mutableStateOf(expanded) }
+
+    LaunchedEffect(expanded) {
+        if (expanded == wasExpanded) return@LaunchedEffect
+        wasExpanded = expanded
+        when {
+            expanded -> {
+                picked = false
+                sounds.menuOpen()
+            }
+
+            picked -> picked = false
+
+            else -> sounds.menuClose()
+        }
+    }
+
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
@@ -75,26 +99,40 @@ public fun FeldMenu(
         ) {
             items.forEachIndexed { i, item ->
                 if (i > 0) FeldDivider(Modifier.padding(horizontal = 14.dp))
-                MenuRow(item, seed + i, onDismiss)
+                MenuRow(
+                    item = item,
+                    seed = seed + i,
+                    onDismiss = onDismiss,
+                    onPick = {
+                        picked = true
+                        if (item.destructive) sounds.delete() else sounds.menuSelect()
+                    },
+                )
             }
         }
     }
 }
 
 @Composable
-private fun MenuRow(item: FeldMenuItem, seed: Int, onDismiss: () -> Unit) {
+private fun MenuRow(item: FeldMenuItem, seed: Int, onDismiss: () -> Unit, onPick: () -> Unit) {
     val color = if (item.destructive) FeldPalette.Orange else MaterialTheme.colorScheme.onSurface
     Row(
         Modifier
             .fillMaxWidth()
             .feldClickable(onClick = {
+                onPick()
                 onDismiss()
                 item.onClick()
             })
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.size(20.dp).padding(bottom = 2.dp), contentAlignment = Alignment.Center) {
+        Box(
+            Modifier
+                .size(20.dp)
+                .padding(bottom = 2.dp),
+            contentAlignment = Alignment.Center,
+        ) {
             if (item.icon != null) {
                 FeldIcon(id = item.icon, seed = seed, size = 18.dp, film = false)
             }
