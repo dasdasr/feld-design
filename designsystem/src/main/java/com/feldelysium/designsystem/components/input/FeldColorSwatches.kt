@@ -28,7 +28,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.feldelysium.designsystem.components.container.HandDiamond
+import com.feldelysium.designsystem.components.container.FeldWornDiamond
 import com.feldelysium.designsystem.components.container.noteRough
 import com.feldelysium.designsystem.foundation.material.FeldPaper
 import com.feldelysium.designsystem.foundation.material.PaperSpec
@@ -165,7 +165,7 @@ private fun Swatch(
         contentAlignment = Alignment.Center,
     ) {
         if (t > 0.01f) {
-            HandDiamond(
+            FeldWornDiamond(
                 color = if (color.luminance() > 0.55f) FeldPalette.Ink else FeldPalette.Cream,
                 seed = seed,
                 size = (swatchSize * diamondFraction.coerceIn(0f, 1f)).coerceAtLeast(0.dp),

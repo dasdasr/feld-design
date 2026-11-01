@@ -109,7 +109,7 @@ private val EntryRough = RoughStyle(
     jerkChance = 0.04f,
 )
 
-internal fun noteRough(seed: Int): RoughStyle {
+public fun noteRough(seed: Int): RoughStyle {
     val r = Random(seed * 31 + 7)
     return EntryRough.copy(
         corner = (2f + r.nextFloat() * 4f).dp,
@@ -374,7 +374,7 @@ public fun FeldNoteCard(
                             .drawBehind { drawDiamondBeat(diamondBrush, hold, pulse?.value) },
                         contentAlignment = Alignment.Center,
                     ) {
-                        HandDiamond(
+                        FeldWornDiamond(
                             accent,
                             modifier = Modifier.graphicsLayer {
                                 val s = beatScale(pulse?.value)
@@ -507,15 +507,21 @@ private class StampLook(seed: Int) {
 }
 
 @Composable
-internal fun HandDiamond(
+public fun FeldWornDiamond(
     color: Color,
     modifier: Modifier = Modifier,
     seed: Int = rememberSeed(),
     size: Dp = 22.dp,
     brush: Brush? = null,
+    ring: Float = 0f,
 ) {
     val density = LocalDensity.current.density
     val b = brush ?: remember(color, seed, density) { cachedDiamondBrush(color, seed, density) }
+    val ringBrush = if (ring > 0.01f) {
+        remember(color, seed, density) { wornBrush(color, seed + 2, density, wear = 0.4f, scale = 10f) }
+    } else {
+        null
+    }
     val j = remember(seed) {
         val r = Random(seed * 131 + 5)
         FloatArray(8) { (r.nextFloat() - 0.5f) * 0.07f }
@@ -530,6 +536,7 @@ internal fun HandDiamond(
             lineTo(w * (0.02f + abs(j[6])), h * (0.5f + j[7]))
             close()
         }
+        if (ringBrush != null) drawDiamondBeat(ringBrush, hold = ring, t = null)
         drawPath(p, b)
     }
 }
@@ -542,7 +549,7 @@ private fun gauss(t: Float, c: Float, w: Float): Float {
 internal fun beatScale(t: Float?): Float =
     if (t == null) 1f else 1f + 0.18f * gauss(t, 0.07f, 0.05f) + 0.11f * gauss(t, 0.34f, 0.06f)
 
-internal fun DrawScope.drawDiamondBeat(brush: Brush, hold: Float, t: Float?) {
+public fun DrawScope.drawDiamondBeat(brush: Brush, hold: Float, t: Float?) {
     val stroke = 1.5.dp.toPx()
     val r = size.minDimension / 2f + 6.dp.toPx()
     fun diamond(rad: Float) = Path().apply {
