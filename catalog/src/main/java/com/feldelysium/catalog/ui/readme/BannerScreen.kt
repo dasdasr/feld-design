@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.feldelysium.designsystem.components.container.FeldCard
 import com.feldelysium.designsystem.components.content.FeldDistressedTitle
 import com.feldelysium.designsystem.components.content.FeldDistressedTitles
+import com.feldelysium.designsystem.components.feedback.FeldBadge
 import com.feldelysium.designsystem.foundation.decal.DecalSpec
 import com.feldelysium.designsystem.foundation.decal.FeldDecalType
 import com.feldelysium.designsystem.foundation.material.FeldMarker
@@ -93,11 +94,11 @@ fun FeldBanner(
                             letterSpacing = 1.2.sp,
                         ),
                     )
-                    Stamp(
+                    FeldBadge(
                         text = subtitle,
-                        color = FeldPalette.Orange,
+                        accent = FeldPalette.Orange,
                         seed = seed,
-                        u = u * 1.1f,
+                        unit = u * 1.1f,
                         rotation = -3f,
                         modifier = Modifier.padding(start = 8.dp)
                     )

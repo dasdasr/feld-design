@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.feldelysium.designsystem.components.container.FeldCard
 import com.feldelysium.designsystem.components.content.FeldDistressedTitle
 import com.feldelysium.designsystem.components.content.FeldDistressedTitles
+import com.feldelysium.designsystem.components.feedback.FeldBadge
 import com.feldelysium.designsystem.foundation.decal.DecalSpec
 import com.feldelysium.designsystem.foundation.decal.FeldDecalType
 import com.feldelysium.designsystem.foundation.material.FeldMarker
@@ -81,27 +82,6 @@ private fun Modifier.roughEdges(
     val amp = 0.4.dp.toPx()
     if (bottom) wobbleLine(Offset(0f, size.height), Offset(size.width, size.height), rng, c, w, amp)
     if (end) wobbleLine(Offset(size.width, 0f), Offset(size.width, size.height), rng, c, w, amp)
-}
-
-@Composable
-fun Stamp(text: String, color: Color, seed: Int, u: Float, modifier: Modifier = Modifier, rotation: Float = -5f) {
-    Box(
-        modifier
-            .graphicsLayer { rotationZ = rotation }
-            .markerFilmMaterial(FeldMarker.Dry.copy(color = color, coverage = 0.85f), seed)
-            .border((u * 0.12f).dp, Color.White)
-            .padding(horizontal = (u * 1.1f).dp, vertical = (u * 0.4f).dp),
-    ) {
-        Text(
-            text = text.uppercase(),
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontSize = (u * 1.7f).sp,
-                lineHeight = (u * 1.8f).sp,
-                letterSpacing = 1.sp,
-                color = Color.White,
-            ),
-        )
-    }
 }
 
 @Composable
@@ -301,12 +281,13 @@ fun FeldSpecPlate(
                             ),
                         )
                         Spacer(Modifier.height((u * 0.4f).dp))
-                        Stamp(
+                        FeldBadge(
                             text = tag,
-                            color = FeldPalette.Orange,
+                            accent = FeldPalette.Orange,
+                            contentColor = Color.White,
                             seed = seed + 3,
-                            u = u,
-                            modifier = Modifier.padding(start = 8.dp)
+                            unit = u,
+                            modifier = Modifier.padding(start = 8.dp),
                         )
                     }
 

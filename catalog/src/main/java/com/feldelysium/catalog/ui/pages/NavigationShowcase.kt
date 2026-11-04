@@ -35,7 +35,7 @@ private val NavigationSubjects = listOf(
                     title = title,
                     eyebrow = eyebrow,
                     subtitle = subtitle.ifBlank { null },
-                    navIcon = if (back) FeldIconId.Back else null,
+                    navIcon = if (back) FeldIconId.ArrowBack else null,
                     onNav = {},
                     divider = divider,
                 )

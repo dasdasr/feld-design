@@ -115,7 +115,7 @@ private fun FeldDialogHeader(title: String, onDismiss: () -> Unit, eyebrow: Stri
     }
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            FeldIconButton(FeldIconId.Back, onDismiss, sound = false)
+            FeldIconButton(FeldIconId.ArrowBack, onDismiss, sound = false)
             if (eyebrow != null) {
                 Text(
                     eyebrow.uppercase(),

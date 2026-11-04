@@ -6,6 +6,7 @@ uniform float seed;
 uniform float u;
 uniform float fillX;
 uniform float fadeW;
+uniform float cutout;
 layout(color) uniform half4 fillColor;
 layout(color) uniform half4 offColor;
 ${NOISE_LIB}
@@ -48,7 +49,8 @@ half4 main(float2 p) {
     o *= 1.04 - 0.10 * vy;
 
     float jitter = (noise(sp / (0.6 * u)) - 0.5) * fadeW * 0.8;
-    float m = 1.0 - smoothstep(fillX - fadeW, fillX, p.x + jitter);
+    float edge = fillX - cutout;
+    float m = 1.0 - smoothstep(edge - fadeW, edge, p.x + jitter);
 
     float3 rgb = mix(o, f, m);
     rgb *= 0.88 + 0.12 * smoothstep(0.0, 2.0 * u, -dist);

@@ -39,8 +39,10 @@ import com.feldelysium.catalog.ui.feedback.LocalFeedbackHub
 import com.feldelysium.catalog.ui.feedback.SoundPreset
 import com.feldelysium.designsystem.components.button.FeldButton
 import com.feldelysium.designsystem.components.button.FeldDialogActions
+import com.feldelysium.designsystem.components.button.FeldIconButton
 import com.feldelysium.designsystem.components.button.FeldTextButton
 import com.feldelysium.designsystem.components.content.FeldIconId
+import com.feldelysium.designsystem.components.input.FeldCheckbox
 import com.feldelysium.designsystem.components.input.FeldChip
 import com.feldelysium.designsystem.components.input.FeldMenu
 import com.feldelysium.designsystem.components.input.FeldMenuItem
@@ -69,8 +71,8 @@ internal fun SoundHapticsShowcase(onBack: () -> Unit) {
 
     CompositionLocalProvider(LocalFeldSounds provides SilentSounds) {
         ShowcaseScreen(
-            title = "Sound & Haptics",
-            eyebrow = "FEEDBACK",
+            title = "SFX",
+            eyebrow = "SOUND & HAPTIC",
             onBack = onBack,
             subjects = listOf(
                 Subject("Feedback") { seed ->
@@ -78,6 +80,16 @@ internal fun SoundHapticsShowcase(onBack: () -> Unit) {
                         preview = { FeedbackPreview(hub, seed) },
                         controls = { SoundControls(hub) },
                         variants = { HapticControls(hub) },
+                        stageAction = {
+                            FeldIconButton(
+                                id = FeldIconId.Sound,
+                                onClick = {
+                                    if (s.mode != 1) hub.playSound(s.soundPreset)
+                                    else hub.playHaptic(s.hapticPreset)
+                                },
+                                enabled = if (s.mode != 1) s.soundEnabled else s.hapticEnabled,
+                            )
+                        },
                         controlsLabel = "Sound",
                         variantsLabel = "Haptic",
                         code = { feedbackCode(s) },
@@ -96,34 +108,26 @@ internal fun SoundHapticsShowcase(onBack: () -> Unit) {
 @Composable
 private fun FeedbackPreview(hub: FeedbackHub, seed: Int) {
     val s = hub.state
-    val soundMode = s.mode != 1
     val key = s.currentKey
 
-    // Real components, real FeldSounds path: component -> hub.sounds -> preset.
     CompositionLocalProvider(LocalFeldSounds provides hub.sounds) {
         Column(
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            FeldButton(
-                text = if (soundMode) "Play Sound" else "Test Haptic",
-                onClick = { if (soundMode) hub.playSound(s.soundPreset) else hub.playHaptic(s.hapticPreset) },
-                enabled = if (soundMode) s.soundEnabled else s.hapticEnabled,
-                sound = false, // otherwise it also fires Button.Press
-                seed = seed,
-            )
             Text(
                 "${key.component.title} · ${key.event}".uppercase(),
                 style = CatalogMono,
                 color = FeldPalette.Muted,
             )
-            ComponentPreview(hub, key.component, seed)
+            ComponentPreview(key.component, seed)
         }
     }
 }
 
 @Composable
-private fun ComponentPreview(hub: FeedbackHub, component: FeedbackComponent, seed: Int) {
+private fun ComponentPreview(component: FeedbackComponent, seed: Int) {
     when (component) {
         FeedbackComponent.Button -> FeldButton(text = "Press me", onClick = {}, seed = seed)
 
@@ -132,16 +136,14 @@ private fun ComponentPreview(hub: FeedbackHub, component: FeedbackComponent, see
             FeldSwitch(checked = on, onCheckedChange = { on = it }, seed = seed)
         }
 
-        // No checkbox component in the design system yet, so this one fires manually.
         FeedbackComponent.Checkbox -> {
             var checked by remember { mutableStateOf(false) }
-            FeldChip(
-                text = if (checked) "Checked" else "Unchecked",
-                selected = checked,
-                onClick = {
-                    checked = !checked
-                    hub.fire(EventKey(component, if (checked) "Check" else "Uncheck"))
-                },
+
+            FeldCheckbox(
+                checked = checked,
+                onCheckedChange = { checked = it },
+                label = if (checked) "Enabled" else "Disabled",
+                seed = seed,
             )
         }
 
@@ -206,8 +208,6 @@ private fun ComponentPreview(hub: FeedbackHub, component: FeedbackComponent, see
     }
 }
 
-// Sound tab
-
 @Composable
 private fun ColumnScope.SoundControls(hub: FeedbackHub) {
     val s = hub.state
@@ -264,8 +264,6 @@ private fun ColumnScope.CustomSoundSection(hub: FeedbackHub) {
     }
 }
 
-// Haptic tab
-
 @Composable
 private fun ColumnScope.HapticControls(hub: FeedbackHub) {
     val s = hub.state
@@ -302,8 +300,6 @@ private fun ColumnScope.HapticControls(hub: FeedbackHub) {
 
     ComponentSection(hub, soundMode = false)
 }
-
-// Component assignment
 
 @Composable
 private fun ColumnScope.ComponentSection(hub: FeedbackHub, soundMode: Boolean) {
