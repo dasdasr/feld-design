@@ -17,19 +17,29 @@ internal data class SeedScope(val base: Int) {
 
 internal val LocalSeedScope = staticCompositionLocalOf { SeedScope(0) }
 
+/**
+ * Provides a deterministic seed scope for all descendant composables.
+ */
 @Composable
 public fun ProvideSeedScope(sessionSeed: Int = rememberSaveable { Random.nextInt() }, content: @Composable () -> Unit) {
     val scope = remember(sessionSeed) { SeedScope(sessionSeed) }
     CompositionLocalProvider(LocalSeedScope provides scope, content = content)
 }
 
+/**
+ * Creates an isolated seed scope derived from the parent scope and [key].
+ */
 @Composable
-internal fun SeedBranch(key: Any?, content: @Composable () -> Unit) {
+public fun SeedBranch(key: Any?, content: @Composable () -> Unit) {
     val parent = LocalSeedScope.current
     val child = remember(parent, key) { parent.child(key) }
     CompositionLocalProvider(LocalSeedScope provides child, content = content)
 }
 
+/**
+ * Returns a stable seed derived from the current scope, composition position,
+ * and optional [key].
+ */
 @Composable
 public fun rememberSeed(key: Any? = null): Int {
     val scope = LocalSeedScope.current

@@ -47,15 +47,15 @@ public data class StickerTapeSpec(
     val edgeInset: Dp get() = tearAmp + max(abs(slantLeft.value), abs(slantRight.value)).dp
 }
 
-internal object FeldTape {
-    val Cream = StickerTapeSpec(
+public object FeldTape {
+    public val Cream: StickerTapeSpec = StickerTapeSpec(
         base = Color(0xFFD9C5A1),
         stain = Color(0xFF8A7352),
         rim = Color(0xFFEFE3C8),
     )
 }
 
-internal fun Modifier.stickerTapeMaterial(spec: StickerTapeSpec, seed: Int = 0): Modifier = drawWithCache {
+public fun Modifier.stickerTapeMaterial(spec: StickerTapeSpec, seed: Int = 0): Modifier = drawWithCache {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         val shader = RuntimeShader(STICKER_TAPE_AGSL).apply {
             setFloatUniform("size", size.width, size.height)

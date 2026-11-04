@@ -73,7 +73,7 @@ public data class DistressSpec(
     )
 }
 
-internal fun Modifier.distressMaterial(spec: DistressSpec, seed: Int = 0, bakeKey: Any? = null): Modifier =
+public fun Modifier.distressMaterial(spec: DistressSpec, seed: Int = 0, bakeKey: Any? = null): Modifier =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         if (bakeKey != null) {
             distressBaked(spec, seed, bakeKey)

@@ -12,6 +12,7 @@ import com.feldelysium.catalog.ui.pages.PaperShowcase
 import com.feldelysium.catalog.ui.pages.SettingsShowcase
 import com.feldelysium.catalog.ui.pages.SoundHapticsShowcase
 import com.feldelysium.catalog.ui.pages.TypographyShowcase
+import com.feldelysium.catalog.ui.readme.FeldDesignSheetScreen
 
 internal enum class ShowcaseGroup(val title: String) {
     Foundations("Foundations"),
@@ -38,4 +39,5 @@ internal val ShowcaseRegistry = listOf(
     ShowcaseEntry("content", "Content", "Icons, titles, tags", ShowcaseGroup.Components) { ContentShowcase(it) },
     ShowcaseEntry("settings", "Settings", "Rows and sections", ShowcaseGroup.Components) { SettingsShowcase(it) },
     ShowcaseEntry("dialog", "Dialog", "Modal with actions", ShowcaseGroup.Components) { DialogShowcase(it) },
+    ShowcaseEntry("sheet", "Design sheet", "Scroll and screenshot", ShowcaseGroup.Foundations) { FeldDesignSheetScreen(it) },
 )

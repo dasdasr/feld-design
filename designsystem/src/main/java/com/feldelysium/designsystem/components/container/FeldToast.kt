@@ -36,7 +36,7 @@ import kotlin.time.Duration.Companion.milliseconds
 private val ToastRough = RoughStyle(roughness = 1.dp, corner = 3.dp, tornChance = 0.15f)
 
 @Composable
-internal fun FeldToast(
+public fun FeldToast(
     text: String,
     modifier: Modifier = Modifier,
     accent: Color = FeldPalette.Orange,

@@ -33,6 +33,7 @@ import com.feldelysium.designsystem.foundation.material.markerFilmMaterial
 import com.feldelysium.designsystem.theme.FeldTheme
 
 public enum class FeldIconId {
+    Temp,
     Back,
     Accept,
     BackingCube,
@@ -45,6 +46,7 @@ public enum class FeldIconId {
     Delete,
     Add,
     Close,
+    Shut,
     Chevron,
     DialogueStyle,
     Font,
@@ -76,7 +78,7 @@ public enum class FeldIconId {
     Paste,
     Search,
     Casino,
-    Oprions,
+    Options,
     RadioButtonChecked,
     RadioButtonUnchecked,
 }
@@ -94,6 +96,7 @@ public fun FeldIcon(
     film: Boolean = true,
 ) {
     @DrawableRes val res: Int = when (id) {
+        FeldIconId.Temp -> R.drawable.speed_o_light
         FeldIconId.Back -> R.drawable.feld_ic_back
         FeldIconId.Accept -> R.drawable.feld_ic_accept
         FeldIconId.BackingCube -> R.drawable.feld_ic_backing_cube
@@ -106,6 +109,7 @@ public fun FeldIcon(
         FeldIconId.Tag -> R.drawable.feld_ic_tag
         FeldIconId.AuthorSamples -> R.drawable.feld_ic_author_samples
         FeldIconId.Close -> R.drawable.feld_ic_cancel
+        FeldIconId.Shut -> R.drawable.feld_ic_close
         FeldIconId.Chevron -> R.drawable.feld_ic_chevron
         FeldIconId.BulkImport -> R.drawable.feld_ic_bulk_import
         FeldIconId.Typeface -> R.drawable.feld_ic_typeface
@@ -133,7 +137,7 @@ public fun FeldIcon(
         FeldIconId.Paste -> R.drawable.feld_ic_paste
         FeldIconId.Search -> R.drawable.feld_ic_search
         FeldIconId.Casino -> R.drawable.feld_ic_dice_5
-        FeldIconId.Oprions -> R.drawable.feld_ic_options
+        FeldIconId.Options -> R.drawable.feld_ic_options
         FeldIconId.RadioButtonChecked -> R.drawable.feld_ic_radio_button_checked
         FeldIconId.RadioButtonUnchecked -> R.drawable.feld_ic_radio_button_unchecked
         FeldIconId.Reals -> R.drawable.feld_ic_real
@@ -162,7 +166,7 @@ public fun FeldIcon(
 }
 
 @Composable
-internal fun FlatDiamond(color: Color, modifier: Modifier = Modifier, size: Dp = 28.dp, outline: Boolean = false) {
+public fun FlatDiamond(color: Color, modifier: Modifier = Modifier, size: Dp = 28.dp, outline: Boolean = false) {
     Canvas(modifier.size(size)) {
         val w = this.size.width
         val h = this.size.height

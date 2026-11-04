@@ -14,18 +14,24 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.drawText
 
-internal interface Decal {
-    val extent: Size
-    fun DrawScope.draw(color: Color, alpha: Float)
+/**
+ * Describes a drawable decal with its intrinsic size and rendering logic.
+ */
+public interface Decal {
+    public val extent: Size
+    public fun DrawScope.draw(color: Color, alpha: Float)
 }
 
-internal class Placement(
-    val decal: Decal,
-    val bounds: Rect,
-    val rotation: Float,
-    val mirror: Boolean,
-    val color: Color,
-    val alpha: Float,
+/**
+ * Defines a decal's position, rotation, mirroring, color, and opacity.
+ */
+public class Placement(
+    public val decal: Decal,
+    public val bounds: Rect,
+    public val rotation: Float,
+    public val mirror: Boolean,
+    public val color: Color,
+    public val alpha: Float,
 )
 
 internal class RulerDecal(
