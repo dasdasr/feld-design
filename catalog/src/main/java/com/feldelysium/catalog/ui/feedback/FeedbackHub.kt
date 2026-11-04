@@ -42,7 +42,7 @@ internal class FeedbackHub(context: Context) {
         private fun f(c: FeedbackComponent, e: String) = fire(EventKey(c, e))
         override fun click(seed: Int) = f(FeedbackComponent.Button, "Press")
         override fun select() = f(FeedbackComponent.Chip, "Select")
-        override fun toggle(seed: Int) = f(FeedbackComponent.Switch, "Turn On") // legacy fallback
+        override fun toggle(seed: Int) = f(FeedbackComponent.Switch, "Turn On")
         override fun cancel() = f(FeedbackComponent.Dialog, "Cancel")
         override fun save() = f(FeedbackComponent.Dialog, "Confirm")
         override fun delete() = f(FeedbackComponent.Dialog, "Delete")

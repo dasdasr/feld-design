@@ -4,6 +4,14 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
+fun versionCodeFrom(version: String): Int {
+    val parts = version.substringBefore('-').split('.').map { it.toIntOrNull() ?: 0 }
+    val major = parts.getOrElse(0) { 0 }
+    val minor = parts.getOrElse(1) { 0 }
+    val patch = parts.getOrElse(2) { 0 }
+    return (major * 10_000 + minor * 100 + patch).coerceAtLeast(1)
+}
+
 android {
     namespace = "com.feldelysium.catalog"
     compileSdk {
@@ -14,8 +22,8 @@ android {
         applicationId = "com.feldelysium.catalog"
         minSdk = 24
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = versionCodeFrom(project.version.toString())
+        versionName = project.version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,6 +52,7 @@ detekt {
     buildUponDefaultConfig = true
     config.setFrom("$rootDir/config/detekt/detekt.yml")
     parallel = true
+    autoCorrect = !providers.environmentVariable("CI").isPresent
 }
 
 dependencies {

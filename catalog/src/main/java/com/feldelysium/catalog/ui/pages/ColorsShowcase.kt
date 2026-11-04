@@ -117,7 +117,7 @@ private val ColorSubjects = listOf(
         val groups = rememberColorGroups()
         val tokens = groups.flatMap { it.tokens }
         val starts = groups.runningFold(0) { acc, group -> acc + group.tokens.size }
-        var selected by remember { mutableIntStateOf(5) } // Orange
+        var selected by remember { mutableIntStateOf(5) }
 
         ShowcaseSpec(
             controlsLabel = "Palette",

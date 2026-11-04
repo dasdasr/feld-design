@@ -69,6 +69,8 @@ public fun FeldSlider(
     label: String? = null,
     valueText: ((Float) -> String)? = null,
     trackHeight: Dp = 10.dp,
+    thumbShadow: Float = 1f,
+    trackCutout: Dp = 0.dp,
     seed: Int = rememberSeed(),
     onValueChangeFinished: (() -> Unit)? = null,
 ) {
@@ -164,7 +166,9 @@ public fun FeldSlider(
                 Modifier
                     .fillMaxWidth()
                     .height(trackHeight)
-                    .sliderTrack(accent, OffColor, seed, thumbW) { shownFraction() },
+                    .sliderTrack(accent, OffColor, seed, thumbW, trackCutout) {
+                        shownFraction()
+                    },
             )
 
             Box(
@@ -176,73 +180,88 @@ public fun FeldSlider(
                         scaleX = s
                         scaleY = s
                     }
-                    .sliderThumb(thumb, seed + 5) { pressState.value },
+                    .sliderThumb(thumb, seed + 5, thumbShadow) {
+                        pressState.value
+                    },
             )
         }
     }
 }
 
-private fun Modifier.sliderTrack(fill: Color, off: Color, seed: Int, thumbW: Float, fraction: () -> Float): Modifier =
-    drawWithCache {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val shader = RuntimeShader(SLIDER_TRACK_AGSL).apply {
-                setFloatUniform("size", size.width, size.height)
-                setFloatUniform("seed", seed.mod(97).toFloat())
-                setFloatUniform("u", density)
-                setFloatUniform("fadeW", 18.dp.toPx())
-                setColorUniform("fillColor", fill.toArgb())
-                setColorUniform("offColor", off.toArgb())
-            }
-            val brush = ShaderBrush(shader)
-            onDrawWithContent {
-                shader.setFloatUniform("fillX", thumbW / 2f + fraction() * (size.width - thumbW))
-                drawRect(brush)
-            }
-        } else {
-            onDrawWithContent {
-                val r = CornerRadius(size.height / 2f)
-                drawRoundRect(off, cornerRadius = r)
-                val x = thumbW / 2f + fraction() * (size.width - thumbW)
-                clipRect(right = x) { drawRoundRect(fill, cornerRadius = r) }
-            }
+private fun Modifier.sliderTrack(
+    fill: Color,
+    off: Color,
+    seed: Int,
+    thumbW: Float,
+    cutout: Dp,
+    fraction: () -> Float,
+): Modifier = drawWithCache {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val shader = RuntimeShader(SLIDER_TRACK_AGSL).apply {
+            setFloatUniform("size", size.width, size.height)
+            setFloatUniform("seed", seed.mod(97).toFloat())
+            setFloatUniform("u", density)
+            setFloatUniform("fadeW", 18.dp.toPx())
+            setColorUniform("fillColor", fill.toArgb())
+            setColorUniform("offColor", off.toArgb())
+            setFloatUniform("cutout", cutout.toPx())
         }
-    }
-
-private fun Modifier.sliderThumb(kind: FeldThumb, seed: Int, press: () -> Float): Modifier = drawWithCache {
-    val w = size.width
-    val h = size.height
-    val path = Path().apply {
-        when (kind) {
-            FeldThumb.Diamond -> {
-                moveTo(w / 2f, 0f)
-                lineTo(w, h / 2f)
-                lineTo(w / 2f, h)
-                lineTo(0f, h / 2f)
-                close()
-            }
-
-            FeldThumb.Circle -> addOval(androidx.compose.ui.geometry.Rect(0f, 0f, w, h))
-
-            FeldThumb.Rectangle -> addRoundRect(RoundRect(0f, 0f, w, h, CornerRadius(3.dp.toPx())))
+        val brush = ShaderBrush(shader)
+        onDrawWithContent {
+            shader.setFloatUniform("fillX", thumbW / 2f + fraction() * (size.width - thumbW))
+            drawRect(brush)
         }
-    }
-    val brush = accentBrush(FeldPalette.Cream, seed, density, fade = 0.55f, glow = 0.7f, grain = 0.06f)
-    val rim = Stroke(0.8.dp.toPx(), join = StrokeJoin.Round)
-    val unit = 1.dp.toPx()
-
-    onDrawWithContent {
-        val p = press()
-        for (i in 1..3) {
-            val dy = (1f + i * 1.1f + 2f * p) * unit
-            withTransform({
-                translate(0f, dy)
-                scale(1f + 0.04f * i, 1f + 0.04f * i)
-            }) { drawPath(path, Color.Black, alpha = 0.13f) }
+    } else {
+        onDrawWithContent {
+            val r = CornerRadius(size.height / 2f)
+            drawRoundRect(off, cornerRadius = r)
+            val x = thumbW / 2f + fraction() * (size.width - thumbW)
+            clipRect(right = x) { drawRoundRect(fill, cornerRadius = r) }
         }
-        drawPath(path, brush)
-        drawPath(path, ThumbRim, alpha = 0.5f, style = rim)
     }
 }
+
+private fun Modifier.sliderThumb(kind: FeldThumb, seed: Int, shadow: Float, press: () -> Float): Modifier =
+    drawWithCache {
+        val w = size.width
+        val h = size.height
+        val path = Path().apply {
+            when (kind) {
+                FeldThumb.Diamond -> {
+                    moveTo(w / 2f, 0f)
+                    lineTo(w, h / 2f)
+                    lineTo(w / 2f, h)
+                    lineTo(0f, h / 2f)
+                    close()
+                }
+
+                FeldThumb.Circle -> addOval(androidx.compose.ui.geometry.Rect(0f, 0f, w, h))
+
+                FeldThumb.Rectangle -> addRoundRect(RoundRect(0f, 0f, w, h, CornerRadius(3.dp.toPx())))
+            }
+        }
+        val brush = accentBrush(FeldPalette.Cream, seed, density, fade = 0.55f, glow = 0.7f, grain = 0.06f)
+        val rim = Stroke(0.8.dp.toPx(), join = StrokeJoin.Round)
+        val unit = 1.dp.toPx()
+
+        onDrawWithContent {
+            val p = press()
+            for (i in 1..3) {
+                val dy = (1f + i * 1.1f + 2f * p) * unit * shadow
+                withTransform({
+                    translate(0f, dy)
+                    scale(
+                        1f + 0.04f * i * shadow,
+                        1f + 0.04f * i * shadow,
+                    )
+                }) {
+                    drawPath(path, Color.Black, alpha = 0.13f * shadow)
+                }
+            }
+            drawPath(path, brush)
+            drawPath(path, ThumbRim, alpha = 0.5f, style = rim)
+        }
+    }
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B1011, widthDp = 360)
 @Composable

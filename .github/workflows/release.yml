@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build designsystem and catalog
+        run: |
+          VERSION_NAME="${GITHUB_REF_NAME#v}"
+          ./gradlew :designsystem:assembleRelease :catalog:assembleDebug \
+            -PversionName="$VERSION_NAME"
+
+      - name: Rename APK
+        run: |
+          cp catalog/build/outputs/apk/debug/catalog-debug.apk \
+             "catalog-${GITHUB_REF_NAME}.apk"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "catalog-${GITHUB_REF_NAME}.apk" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes
+
+      - name: Trigger JitPack build
+        run: |
+          curl -s --max-time 600 \
+            "https://jitpack.io/com/github/dasdasr/feld-design/${GITHUB_REF_NAME}/build.log" || true

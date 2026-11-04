@@ -6,6 +6,7 @@ import com.feldelysium.catalog.ui.pages.ColorsShowcase
 import com.feldelysium.catalog.ui.pages.ContainersShowcase
 import com.feldelysium.catalog.ui.pages.ContentShowcase
 import com.feldelysium.catalog.ui.pages.DialogShowcase
+import com.feldelysium.catalog.ui.pages.FeedbackShowcase
 import com.feldelysium.catalog.ui.pages.InputShowcase
 import com.feldelysium.catalog.ui.pages.NavigationShowcase
 import com.feldelysium.catalog.ui.pages.PaperShowcase
@@ -32,10 +33,13 @@ internal val ShowcaseRegistry = listOf(
     ShowcaseEntry("paper", "Paper", "Surfaces and rough edges", ShowcaseGroup.Foundations) { PaperShowcase(it) },
     ShowcaseEntry("sound", "Sound & Haptics", "Feedback for every press", ShowcaseGroup.Foundations) { SoundHapticsShowcase(it) },
     ShowcaseEntry("buttons", "Buttons", "Press, tilt and tear", ShowcaseGroup.Components) { ButtonsShowcase(it) },
-    ShowcaseEntry("input", "Input", "Fields, chips, sliders, menus", ShowcaseGroup.Components) { InputShowcase(it) },
-    ShowcaseEntry("containers", "Containers", "Cards, boxes, dividers, toasts", ShowcaseGroup.Components) { ContainersShowcase(it) },
+    ShowcaseEntry("input", "Input", "Fields, chips, sliders, menus, checks", ShowcaseGroup.Components) { InputShowcase(it) },
+    ShowcaseEntry("containers", "Containers", "Cards, boxes, dividers, toasts, snackbars", ShowcaseGroup.Components) { ContainersShowcase(it) },
+    ShowcaseEntry("feedback", "Feedback", "Badges, progress, states, tooltips", ShowcaseGroup.Components) { FeedbackShowcase(it) },
     ShowcaseEntry("navigation", "Navigation", "Headers, action bars, toolbars", ShowcaseGroup.Components) { NavigationShowcase(it) },
     ShowcaseEntry("content", "Content", "Icons, titles, tags", ShowcaseGroup.Components) { ContentShowcase(it) },
     ShowcaseEntry("settings", "Settings", "Rows and sections", ShowcaseGroup.Components) { SettingsShowcase(it) },
     ShowcaseEntry("dialog", "Dialog", "Modal with actions", ShowcaseGroup.Components) { DialogShowcase(it) },
 )
+
+internal val ShowcaseById: Map<String, ShowcaseEntry> = ShowcaseRegistry.associateBy { it.id }

@@ -36,6 +36,7 @@ import com.feldelysium.designsystem.components.container.FeldDivider
 import com.feldelysium.designsystem.components.container.FeldNoteCard
 import com.feldelysium.designsystem.components.container.FeldPaperBox
 import com.feldelysium.designsystem.components.container.FeldSectionHeader
+import com.feldelysium.designsystem.components.container.FeldSnackbar
 import com.feldelysium.designsystem.components.container.FeldToastHost
 import com.feldelysium.designsystem.components.container.rememberFeldToastState
 import com.feldelysium.designsystem.foundation.material.FeldPaper
@@ -193,6 +194,41 @@ private val ContainerSubjects = listOf(
                         "toast.show(text = ${text.quoted()}, accent = FeldPalette.${AccentNames[accent]})\n\n" +
                         "FeldToastHost(state = toast)"
             },
+        )
+    },
+    Subject("Snackbar") { seed ->
+        var message by remember { mutableStateOf("Scene deleted") }
+        var hasAction by remember { mutableStateOf(true) }
+        var accent by remember { mutableIntStateOf(2) }
+        val colors = listOf(FeldPalette.Cream, FeldPalette.Teal, FeldPalette.Orange)
+        var undone by remember { mutableIntStateOf(0) }
+        ShowcaseSpec(
+            textured = true,
+            preview = {
+                FeldSnackbar(
+                    message = message,
+                    modifier = Modifier.fillMaxWidth(),
+                    actionLabel = if (hasAction) "Undo" else null,
+                    onAction = if (hasAction) ({ undone += 1 }) else null,
+                    accent = colors[accent],
+                    seed = seed,
+                )
+            },
+            controls = {
+                ControlText("message", message) { message = it }
+                ControlChoice("accent", AccentNames, accent) { accent = it }
+                ControlSwitch("action", hasAction) { hasAction = it }
+            },
+            code = {
+                kotlinCall(
+                    "FeldSnackbar",
+                    "message" to message.quoted(),
+                    "actionLabel" to "\"Undo\"".takeIf { hasAction },
+                    "onAction" to "{ }".takeIf { hasAction },
+                    "accent" to "FeldPalette.${AccentNames[accent]}".takeIf { accent != 2 },
+                )
+            },
+            notes = listOf("Static message with an optional text action. Undo taps: $undone."),
         )
     },
 )

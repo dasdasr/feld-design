@@ -36,7 +36,7 @@ public data class DryPaperSpec(
     val pressShade: Float = 0.06f,
 )
 
-internal fun Modifier.dryPaperMaterial(spec: DryPaperSpec, seed: Int = 0, press: () -> Float = { 0f }): Modifier =
+public fun Modifier.dryPaperMaterial(spec: DryPaperSpec, seed: Int = 0, press: () -> Float = { 0f }): Modifier =
     drawWithCache {
         val rim = 1.dp.toPx()
 

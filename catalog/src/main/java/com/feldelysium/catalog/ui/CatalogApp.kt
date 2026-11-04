@@ -2,7 +2,7 @@ package com.feldelysium.catalog.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -31,8 +31,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.feldelysium.catalog.ui.feedback.FeedbackHub
 import com.feldelysium.catalog.ui.feedback.LocalFeedbackHub
+import com.feldelysium.catalog.ui.readme.FeldDesignSheetScreen
+import com.feldelysium.designsystem.components.button.FeldIconButton
 import com.feldelysium.designsystem.components.container.FeldCard
-import com.feldelysium.designsystem.components.container.FeldDivider
 import com.feldelysium.designsystem.components.container.FeldSectionHeader
 import com.feldelysium.designsystem.components.content.FeldDiamond
 import com.feldelysium.designsystem.components.content.FeldIconId
@@ -40,6 +41,9 @@ import com.feldelysium.designsystem.foundation.sound.LocalFeldSounds
 import com.feldelysium.designsystem.theme.FeldPalette
 
 private const val HOME = "home"
+
+/** The design sheet is not a catalog page: it is reached from the header button and has its own route. */
+private const val SHEET = "design-sheet"
 
 @Composable
 internal fun CatalogApp() {
@@ -53,20 +57,30 @@ internal fun CatalogApp() {
     ) {
         var route by rememberSaveable { mutableStateOf(HOME) }
         val homeScroll = rememberScrollState()
-        val entry = ShowcaseRegistry.firstOrNull { it.id == route }
+        val goHome = { route = HOME }
 
-        BackHandler(enabled = entry != null) { route = HOME }
+        val entry = ShowcaseById[route]
 
-        if (entry == null) {
-            CatalogHome(scroll = homeScroll, onOpen = { route = it })
-        } else {
-            entry.content { route = HOME }
+        BackHandler(enabled = route != HOME, onBack = goHome)
+
+        when {
+            route == SHEET -> FeldDesignSheetScreen(onBack = goHome)
+            entry != null -> entry.content(goHome)
+            else -> CatalogHome(
+                scroll = homeScroll,
+                onOpen = { route = it },
+                onOpenSheet = { route = SHEET },
+            )
         }
     }
 }
 
 @Composable
-internal fun CatalogHome(scroll: ScrollState, onOpen: (String) -> Unit) {
+internal fun CatalogHome(
+    scroll: ScrollState,
+    onOpen: (String) -> Unit,
+    onOpenSheet: () -> Unit,
+) {
     val groups = remember { ShowcaseRegistry.groupBy { it.group } }
     Column(
         Modifier
@@ -75,9 +89,43 @@ internal fun CatalogHome(scroll: ScrollState, onOpen: (String) -> Unit) {
             .verticalScroll(scroll)
             .padding(horizontal = 20.dp),
     ) {
+        CatalogHeader()
         Spacer(Modifier.height(32.dp))
-        Text("FELD / DESIGN SYSTEM", style = CatalogMono, color = FeldPalette.Orange)
-        Spacer(Modifier.height(12.dp))
+
+        groups.forEach { (group, entries) ->
+            FeldSectionHeader(title = group.title)
+            entries.forEach { entry -> CatalogRow(entry, onClick = { onOpen(entry.id) }) }
+            Spacer(Modifier.height(16.dp))
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 2.dp),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            FeldIconButton(
+                id = FeldIconId.Cassette,
+                size = 30.dp,
+                onClick = onOpenSheet,
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun CatalogHeader() {
+    Column(Modifier.fillMaxWidth().padding(top = 16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                "FELD / DESIGN SYSTEM",
+                style = CatalogMono,
+                color = FeldPalette.Orange,
+            )
+        }
+        Spacer(Modifier.height(4.dp))
         Text(
             "A field guide to the interface",
             style = MaterialTheme.typography.titleMedium,
@@ -85,34 +133,29 @@ internal fun CatalogHome(scroll: ScrollState, onOpen: (String) -> Unit) {
         )
         Spacer(Modifier.height(8.dp))
         Text("${ShowcaseRegistry.size} PAGES · JETPACK COMPOSE", style = CatalogMono, color = FeldPalette.Muted)
-        Spacer(Modifier.height(32.dp))
+    }
+}
 
-        groups.forEach { (group, entries) ->
-            FeldSectionHeader(title = group.title)
-            entries.forEach { entry ->
-                FeldCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 3.dp),
-                    onClick = { onOpen(entry.id) },
-                    contentPadding = PaddingValues(16.dp),
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        FeldDiamond(FeldPalette.Orange, size = 20.dp)
-                        Spacer(Modifier.width(14.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                entry.title.uppercase(),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                            Text(entry.summary, style = CatalogMono, color = FeldPalette.Muted)
-                        }
-                    }
-                }
+@Composable
+private fun CatalogRow(entry: ShowcaseEntry, onClick: () -> Unit) {
+    FeldCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 3.dp),
+        onClick = onClick,
+        contentPadding = PaddingValues(16.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            FeldDiamond(FeldPalette.Orange, size = 20.dp)
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    entry.title.uppercase(),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(entry.summary, style = CatalogMono, color = FeldPalette.Muted)
             }
-            Spacer(Modifier.height(16.dp))
         }
-        Spacer(Modifier.height(32.dp))
     }
 }

@@ -42,7 +42,7 @@ public fun FeldScreenHeader(
     subtitle: String? = null,
     metaStart: String? = null,
     metaEnd: String? = null,
-    navIcon: FeldIconId? = FeldIconId.Back,
+    navIcon: FeldIconId? = FeldIconId.ArrowBack,
     onNav: () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     onDiamondClick: (() -> Unit)? = null,

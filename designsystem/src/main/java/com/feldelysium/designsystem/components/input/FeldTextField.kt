@@ -43,8 +43,8 @@ import com.feldelysium.designsystem.theme.FeldPalette
 import com.feldelysium.designsystem.theme.FeldTheme
 import kotlin.random.Random
 
-internal object FeldRough {
-    fun entry(seed: Int): RoughStyle {
+public object FeldRough {
+    public fun entry(seed: Int): RoughStyle {
         val r = Random(seed * 31 + 7)
         return RoughStyle(
             roughness = 0.6.dp,
@@ -57,7 +57,7 @@ internal object FeldRough {
         )
     }
 
-    fun field(seed: Int): RoughStyle {
+    public fun field(seed: Int): RoughStyle {
         val r = Random(seed * 31 + 11)
         return RoughStyle(
             roughness = 0.55.dp,

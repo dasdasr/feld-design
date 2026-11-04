@@ -33,7 +33,7 @@ import com.feldelysium.designsystem.foundation.shape.RoughStyle
 import com.feldelysium.designsystem.theme.FeldTheme
 
 @Composable
-internal fun FeldDialogCard(
+public fun FeldDialogCard(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,

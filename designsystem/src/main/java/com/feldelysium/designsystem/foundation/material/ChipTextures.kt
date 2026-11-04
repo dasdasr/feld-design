@@ -20,11 +20,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import kotlinx.coroutines.channels.Channel
 import java.util.Random
 
-internal enum class ChipTexture { Base, Filled, Rim }
+public enum class ChipTexture { Base, Filled, Rim }
 
-internal object ChipTextures {
-    const val W = 640
-    const val H = 320
+public object ChipTextures {
+    public const val W: Int = 640
+    public const val H: Int = 320
 
     private data class Key(val argb: Int, val kind: ChipTexture, val density: Float)
 
@@ -32,7 +32,11 @@ internal object ChipTextures {
     private val requested = HashSet<Key>()
     private val queue = Channel<Key>(Channel.UNLIMITED)
 
-    fun brush(color: Color, kind: ChipTexture, density: Float, w: Int, h: Int, seed: Int): Brush {
+    /**
+     * Returns a cached chip texture brush, falling back to a solid color until the texture is baked.
+     * Textures are generated asynchronously by [runBaker].
+     */
+    public fun brush(color: Color, kind: ChipTexture, density: Float, w: Int, h: Int, seed: Int): Brush {
         val bmp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             bitmapFor(Key(color.toArgb(), kind, density))
         } else {
@@ -53,7 +57,10 @@ internal object ChipTextures {
         null
     }
 
-    fun prewarm(density: Float, base: List<Color>, filled: List<Color>, rim: List<Color>) {
+    /**
+     * Queues the specified color and texture combinations for pre-generation.
+     */
+    public fun prewarm(density: Float, base: List<Color>, filled: List<Color>, rim: List<Color>) {
         base.forEach { request(it, ChipTexture.Base, density) }
         filled.forEach { request(it, ChipTexture.Filled, density) }
         rim.forEach { request(it, ChipTexture.Rim, density) }
@@ -64,7 +71,11 @@ internal object ChipTextures {
         if (requested.add(key)) queue.trySend(key)
     }
 
-    suspend fun runBaker(gc: GraphicsContext) {
+    /**
+     * Processes queued texture requests and generates their bitmaps.
+     * Must be launched in a coroutine and kept running while textures are needed.
+     */
+    public suspend fun runBaker(gc: GraphicsContext) {
         for (key in queue) {
             if (!ready.containsKey(key)) ready[key] = bake(gc, key)
         }
@@ -88,7 +99,10 @@ internal object ChipTextures {
         }
     }
 
-    fun clear() {
+    /**
+     * Clears cached textures and pending request tracking.
+     */
+    public fun clear() {
         ready.clear()
         requested.clear()
     }

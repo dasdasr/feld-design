@@ -35,7 +35,7 @@ private val NavigationSubjects = listOf(
                     title = title,
                     eyebrow = eyebrow,
                     subtitle = subtitle.ifBlank { null },
-                    navIcon = if (back) FeldIconId.Back else null,
+                    navIcon = if (back) FeldIconId.ArrowBack else null,
                     onNav = {},
                     divider = divider,
                 )
@@ -98,15 +98,24 @@ private val NavigationSubjects = listOf(
     Subject("Toolbar") { _ ->
         var enabled by remember { mutableStateOf(true) }
         var accent by remember { mutableIntStateOf(2) }
-        val names = listOf("None", "Edit", "Add", "Delete")
+        val entries = listOf(
+            Triple("Edit", FeldIconId.Edit, 1),
+            Triple("Add", FeldIconId.Add, 2),
+            Triple("Delete", FeldIconId.Delete, 3),
+        )
+        val names = listOf("None") + entries.map { it.first }
         ShowcaseSpec(
             preview = {
                 FeldToolbar(
-                    items = listOf(
-                        FeldToolbarItem(icon = FeldIconId.Edit, label = "Edit", enabled = enabled, accent = FeldPalette.Cream, onClick = {}),
-                        FeldToolbarItem(icon = FeldIconId.Add, label = "Add", enabled = enabled, accent = FeldPalette.Orange, onClick = {}),
-                        FeldToolbarItem(icon = FeldIconId.Delete, label = "Delete", enabled = enabled, accent = FeldPalette.Cream, onClick = {}),
-                    ),
+                    items = entries.map { (label, icon, idx) ->
+                        FeldToolbarItem(
+                            icon = icon,
+                            label = label,
+                            enabled = enabled,
+                            accent = FeldPalette.Orange.takeIf { accent == idx },
+                            onClick = {},
+                        )
+                    },
                 )
             },
             controls = {
@@ -114,17 +123,13 @@ private val NavigationSubjects = listOf(
                 ControlSwitch("enabled", enabled) { enabled = it }
             },
             code = {
-                """
-                FeldToolbar(
-                    items = listOf(
-                        FeldToolbarItem(icon = FeldIconId.Edit, label = "Edit", onClick = { }),
-                        FeldToolbarItem(icon = FeldIconId.Add, label = "Add", accent = ${accent == 2}, onClick = { }),
-                        FeldToolbarItem(icon = FeldIconId.Delete, label = "Delete", onClick = { }),
-                    ),
-                )
-                """.trimIndent()
+                val items = entries.joinToString("\n") { (label, _, idx) ->
+                    val accentArg = if (accent == idx) "\n            accent = FeldPalette.Orange," else ""
+                    "        FeldToolbarItem(\n            icon = FeldIconId.$label,\n            label = \"$label\",$accentArg\n            onClick = { },\n        ),"
+                }
+                "FeldToolbar(\n    items = listOf(\n$items\n    ),\n)"
             },
-            notes = listOf("An accent item is wider and tints its icon."),
+            notes = listOf("An accent item is wider, tints its icon and flickers on."),
         )
     },
 )

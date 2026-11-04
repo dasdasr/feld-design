@@ -318,7 +318,7 @@ public class RoughShape(public val seed: Int, public val style: RoughStyle = Rou
     override fun hashCode(): Int = 31 * seed + style.hashCode()
 }
 
-internal class InkLayer(val path: Path, val alpha: Float)
+public class InkLayer(public val path: Path, public val alpha: Float)
 
 private class LoopNoise(seed: Int, private val len: Float, cellPx: Float) {
     private val cells = (len / cellPx).roundToInt().coerceAtLeast(3)
@@ -417,7 +417,7 @@ internal fun RoughShape.buildInkLayers(outline: Path, density: Density, baseWidt
     }
 }
 
-internal fun DrawScope.drawInk(layers: List<InkLayer>, brush: Brush, alpha: Float = 1f) {
+public fun DrawScope.drawInk(layers: List<InkLayer>, brush: Brush, alpha: Float = 1f) {
     if (alpha <= 0f) return
     for (layer in layers) drawPath(layer.path, brush, alpha = layer.alpha * alpha)
 }

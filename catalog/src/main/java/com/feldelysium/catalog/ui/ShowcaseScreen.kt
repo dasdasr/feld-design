@@ -2,7 +2,6 @@ package com.feldelysium.catalog.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,13 +34,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.feldelysium.designsystem.components.button.FeldTextButton
 import com.feldelysium.designsystem.components.container.FeldDivider
 import com.feldelysium.designsystem.components.content.FeldIconId
 import com.feldelysium.designsystem.components.input.FeldChip
 import com.feldelysium.designsystem.components.input.FeldChipShape
 import com.feldelysium.designsystem.components.input.FeldSegmentedControl
-import com.feldelysium.designsystem.components.input.FeldSwitch
 import com.feldelysium.designsystem.components.input.feldClickable
 import com.feldelysium.designsystem.components.navigation.FeldScreenHeader
 import com.feldelysium.designsystem.theme.FeldPalette
@@ -57,6 +54,7 @@ internal class ShowcaseSpec(
     val controls: @Composable ColumnScope.() -> Unit,
     val code: () -> String,
     val variants: (@Composable ColumnScope.() -> Unit)? = null,
+    val stageAction: (@Composable () -> Unit)? = null,
     val variantsLabel: String = "Variants",
     val controlsLabel: String = "Controls",
     val notes: List<String> = emptyList(),
@@ -88,7 +86,7 @@ internal fun ShowcaseScreen(
             .fillMaxSize()
             .systemBarsPadding(),
     ) {
-        FeldScreenHeader(title = title, eyebrow = eyebrow, navIcon = FeldIconId.Back, onNav = onBack)
+        FeldScreenHeader(title = title, eyebrow = eyebrow, navIcon = FeldIconId.ArrowBack, onNav = onBack)
 
         if (subjects.size > 1) {
             SubjectPicker(subjects.map { it.name }, subjectIndex) { subjectIndex = it }
@@ -104,7 +102,13 @@ internal fun ShowcaseScreen(
             val tab = tabs[tabIndex.coerceIn(tabs.indices)]
             LaunchedEffect(tab) { spec.onTab(tabs.indexOf(tab)) }
 
-            Stage(spec.textured, seed, onReroll = { seed += 1 }, content = spec.preview)
+            Stage(
+                textured = spec.textured,
+                seed = seed,
+                onReroll = { seed += 1 },
+                action = spec.stageAction,
+                content = spec.preview,
+            )
 
             Box(Modifier.padding(horizontal = 20.dp, vertical = 14.dp)) {
                 FeldSegmentedControl(
@@ -155,7 +159,13 @@ private fun SubjectPicker(names: List<String>, selected: Int, onSelect: (Int) ->
 }
 
 @Composable
-private fun Stage(textured: Boolean, seed: Int, onReroll: () -> Unit, content: @Composable () -> Unit) {
+private fun Stage(
+    textured: Boolean,
+    seed: Int,
+    onReroll: () -> Unit,
+    action: (@Composable () -> Unit)?,
+    content: @Composable () -> Unit,
+) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -170,6 +180,18 @@ private fun Stage(textured: Boolean, seed: Int, onReroll: () -> Unit, content: @
             Text("LIVE PREVIEW", style = CatalogMono, color = FeldPalette.Orange, modifier = Modifier.weight(1f))
             if (textured) {
                 Text(
+                    "↻ NEW TEXTURE · $seed",
+                    style = CatalogMono,
+                    color = FeldPalette.Cream,
+                    modifier = Modifier
+                        .feldClickable(onClick = onReroll)
+                        .padding(horizontal = 20.dp, vertical = 14.dp),
+                )
+            }
+            when {
+                action != null -> action()
+
+                textured -> Text(
                     "↻ NEW TEXTURE · $seed",
                     style = CatalogMono,
                     color = FeldPalette.Cream,
@@ -200,7 +222,7 @@ private fun CodeTab(code: () -> String, notes: List<String>) {
         SectionLabel("Notes")
         notes.forEach {
             Text(
-                "— $it",
+                "> $it",
                 style = MaterialTheme.typography.bodyMedium,
                 color = FeldPalette.Cream,
                 modifier = Modifier.padding(bottom = 8.dp),

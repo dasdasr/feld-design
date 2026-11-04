@@ -11,9 +11,15 @@ import androidx.compose.ui.unit.LayoutDirection
 import kotlin.math.floor
 import kotlin.random.Random
 
-internal class DecalPlan(val items: List<Placement>, val leak: Leak?)
+/**
+ * Contains the generated decal placements and optional edge leak.
+ */
+public class DecalPlan(public val items: List<Placement>, public val leak: Leak?)
 
-internal fun DrawScope.drawDecals(plan: DecalPlan) {
+/**
+ * Draws all decals in a previously generated plan.
+ */
+public fun DrawScope.drawDecals(plan: DecalPlan) {
     plan.leak?.let { with(it) { draw() } }
     for (p in plan.items) {
         val c = p.bounds.center

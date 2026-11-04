@@ -11,8 +11,11 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+/**
+ * Holds the parameters and text measurement state required to generate a decal layout.
+ */
 @Immutable
-internal class DecalLayer internal constructor(
+public class DecalLayer internal constructor(
     private val ambient: Float,
     private val seed: Int,
     private val spec: DecalSpec,
@@ -21,7 +24,7 @@ internal class DecalLayer internal constructor(
     private val measurer: TextMeasurer,
     private val style: TextStyle,
 ) {
-    internal fun plan(size: Size, density: Density): DecalPlan = planDecals(
+    public fun plan(size: Size, density: Density): DecalPlan = planDecals(
         seed,
         size,
         ambient,
@@ -33,8 +36,12 @@ internal class DecalLayer internal constructor(
     )
 }
 
+/**
+ * Remembers a decal layer for the given configuration.
+ * Returns null when ambient is null or non-positive.
+ */
 @Composable
-internal fun rememberDecalLayer(
+public fun rememberDecalLayer(
     ambient: Float?,
     seed: Int,
     spec: DecalSpec,

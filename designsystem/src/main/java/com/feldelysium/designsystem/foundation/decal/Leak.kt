@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 
-internal class Leak(size: Size, rightSide: Boolean, color: Color, strength: Float) {
+public class Leak(size: Size, rightSide: Boolean, color: Color, strength: Float) {
     private val brush: Brush = run {
         val w = size.width
         val a = strength
@@ -22,5 +22,5 @@ internal class Leak(size: Size, rightSide: Boolean, color: Color, strength: Floa
         }
     }
 
-    fun DrawScope.draw() = drawRect(brush)
+    public fun DrawScope.draw(): Unit = drawRect(brush)
 }

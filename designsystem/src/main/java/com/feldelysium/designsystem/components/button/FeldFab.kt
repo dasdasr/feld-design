@@ -73,7 +73,7 @@ public fun FeldFab(
     size: Dp = 56.dp,
     contentDescription: String? = null,
     onLongClick: (() -> Unit)? = null,
-    variant: FeldFabVariant = FeldFabVariant.Film, // TODO(): Add these variants to Settings
+    variant: FeldFabVariant = FeldFabVariant.Film,
     content: (@Composable () -> Unit)? = null,
 ) {
     val haptics = rememberFeldHaptics()

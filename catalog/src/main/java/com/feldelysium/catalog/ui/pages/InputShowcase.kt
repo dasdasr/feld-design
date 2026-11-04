@@ -2,8 +2,10 @@ package com.feldelysium.catalog.ui.pages
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -26,9 +28,12 @@ import com.feldelysium.catalog.ui.Subject
 import com.feldelysium.catalog.ui.kotlinCall
 import com.feldelysium.catalog.ui.quoted
 import com.feldelysium.designsystem.components.button.FeldGhostButton
+import com.feldelysium.designsystem.components.input.FeldCheckbox
 import com.feldelysium.designsystem.components.input.FeldChip
+import com.feldelysium.designsystem.components.input.FeldDropdown
 import com.feldelysium.designsystem.components.input.FeldMenu
 import com.feldelysium.designsystem.components.input.FeldMenuItem
+import com.feldelysium.designsystem.components.input.FeldRadioButton
 import com.feldelysium.designsystem.components.input.FeldSegmentedControl
 import com.feldelysium.designsystem.components.input.FeldSlider
 import com.feldelysium.designsystem.components.input.FeldSwitch
@@ -85,6 +90,110 @@ private val InputSubjects = listOf(
                 )
             },
             notes = listOf("Type in the preview: the field is fully live."),
+        )
+    },
+    Subject("Checkbox") { seed ->
+        var checked by remember { mutableStateOf(true) }
+        var label by remember { mutableStateOf("Remember choice") }
+        var enabled by remember { mutableStateOf(true) }
+        var accent by remember { mutableIntStateOf(0) }
+        ShowcaseSpec(
+            textured = true,
+            preview = {
+                FeldCheckbox(
+                    checked = checked,
+                    onCheckedChange = { checked = it },
+                    label = label.ifBlank { null },
+                    enabled = enabled,
+                    accent = AccentColors[accent],
+                    seed = seed,
+                )
+            },
+            controls = {
+                ControlText("label", label) { label = it }
+                ControlChoice("accent", AccentNames, accent) { accent = it }
+                ControlSwitch("checked", checked) { checked = it }
+                ControlSwitch("enabled", enabled) { enabled = it }
+            },
+            code = {
+                kotlinCall(
+                    "FeldCheckbox",
+                    "checked" to checked.toString(),
+                    "onCheckedChange" to "{ checked = it }",
+                    "label" to label.ifBlank { null }?.quoted(),
+                    "accent" to "FeldAccentColors.${AccentNames[accent]}".takeIf { accent != 0 },
+                    "enabled" to "false".takeIf { !enabled },
+                )
+            },
+            notes = listOf("The whole row is tappable. Uses the switch sounds for now."),
+        )
+    },
+    Subject("Radio") { seed ->
+        var selected by remember { mutableIntStateOf(0) }
+        var enabled by remember { mutableStateOf(true) }
+        val options = listOf("Cream", "Teal", "Orange")
+        ShowcaseSpec(
+            textured = true,
+            preview = {
+                Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    options.forEachIndexed { i, name ->
+                        FeldRadioButton(
+                            selected = i == selected,
+                            onClick = { selected = i },
+                            label = name,
+                            enabled = enabled,
+                            seed = seed + i,
+                        )
+                    }
+                }
+            },
+            controls = { ControlSwitch("enabled", enabled) { enabled = it } },
+            code = {
+                kotlinCall(
+                    "FeldRadioButton",
+                    "selected" to "selected == 0",
+                    "onClick" to "{ selected = 0 }",
+                    "label" to "\"Cream\"",
+                    "enabled" to "false".takeIf { !enabled },
+                ) + "\n\n// wrap a group in Modifier.selectableGroup()"
+            },
+        )
+    },
+    Subject("Dropdown") { seed ->
+        val options = listOf("English", "Deutsch", "Беларуская", "Polski")
+        var selected by remember { mutableStateOf<String?>(null) }
+        var label by remember { mutableStateOf("Language") }
+        var enabled by remember { mutableStateOf(true) }
+        ShowcaseSpec(
+            textured = true,
+            preview = {
+                FeldDropdown(
+                    options = options,
+                    selected = selected,
+                    onSelect = { selected = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = label.ifBlank { null },
+                    placeholder = "Choose language",
+                    enabled = enabled,
+                    seed = seed,
+                )
+            },
+            controls = {
+                ControlText("label", label) { label = it }
+                ControlSwitch("enabled", enabled) { enabled = it }
+            },
+            code = {
+                kotlinCall(
+                    "FeldDropdown",
+                    "options" to "listOf(" + options.joinToString { it.quoted() } + ")",
+                    "selected" to "selected",
+                    "onSelect" to "{ selected = it }",
+                    "label" to label.ifBlank { null }?.quoted(),
+                    "placeholder" to "\"Choose language\"",
+                    "enabled" to "false".takeIf { !enabled },
+                )
+            },
+            notes = listOf("selected = null shows the placeholder. The menu is as wide as its content (FeldMenu)."),
         )
     },
     Subject("Chip") { seed ->
@@ -165,6 +274,8 @@ private val InputSubjects = listOf(
         var showLabel by remember { mutableStateOf(true) }
         var showValue by remember { mutableStateOf(true) }
         var track by remember { mutableFloatStateOf(10f) }
+        var thumbShadow by remember { mutableFloatStateOf(1f) }
+        var trackCutout by remember { mutableFloatStateOf(0f) }
         ShowcaseSpec(
             textured = true,
             preview = {
@@ -177,6 +288,8 @@ private val InputSubjects = listOf(
                     valueText = if (showValue) Percent else null,
                     trackHeight = track.dp,
                     seed = seed,
+                    thumbShadow = thumbShadow,
+                    trackCutout = trackCutout.dp,
                 )
             },
             controls = {
@@ -185,6 +298,19 @@ private val InputSubjects = listOf(
                 ControlSwitch("label", showLabel) { showLabel = it }
                 ControlSwitch("value text", showValue) { showValue = it }
                 ControlSlider("track height", track, 4f..20f, { track = it }) { "${it.toInt()} dp" }
+                ControlSlider(
+                    "thumb shadow",
+                    thumbShadow,
+                    0f..2f,
+                    { thumbShadow = it },
+                ) { "%.1f".format(it) }
+
+                ControlSlider(
+                    "track cutout",
+                    trackCutout,
+                    0f..6f,
+                    { trackCutout = it },
+                ) { "%.1f".format(it) + " dp" }
             },
             code = {
                 kotlinCall(
@@ -196,6 +322,10 @@ private val InputSubjects = listOf(
                     "label" to "\"Volume\"".takeIf { showLabel },
                     "valueText" to "{ \"\${(it * 100).toInt()}%\" }".takeIf { showValue },
                     "trackHeight" to "${track.toInt()}.dp".takeIf { track != 10f },
+                    "thumbShadow" to "${"%.1f".format(thumbShadow)}f"
+                        .takeIf { thumbShadow != 1f },
+                    "trackCutout" to "${trackCutout.toInt()}.dp"
+                        .takeIf { trackCutout != 0f },
                 )
             },
         )
@@ -204,7 +334,8 @@ private val InputSubjects = listOf(
         var selected by remember { mutableIntStateOf(0) }
         var count by remember { mutableIntStateOf(1) }
         var long by remember { mutableStateOf(false) }
-        val labels = if (long) listOf("Tab 1", "Tab 2", "Tab 33333333333", "Tab 4") else listOf("Day", "Week", "Month", "All")
+        val labels =
+            if (long) listOf("Tab 1", "Tab 2", "Tab 33333333333", "Tab 4") else listOf("Day", "Week", "Month", "All")
         ShowcaseSpec(
             textured = true,
             preview = {
@@ -243,7 +374,12 @@ private val InputSubjects = listOf(
                         onDismiss = { open = false },
                         items = buildList {
                             add(FeldMenuItem(label = "Rename", onClick = { open = false }))
-                            if (destructive) add(FeldMenuItem(label = "Delete", destructive = true, onClick = { open = false }))
+                            if (destructive) add(
+                                FeldMenuItem(
+                                    label = "Delete",
+                                    destructive = true,
+                                    onClick = { open = false })
+                            )
                         },
                     )
                 }

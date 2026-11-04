@@ -52,7 +52,7 @@ public fun Modifier.paperSurface(
     paperMaterial(shape, spec, textured = textured)
 }
 
-internal fun Modifier.paperMaterial(
+public fun Modifier.paperMaterial(
     shape: RoughShape,
     spec: PaperSpec,
     wear: Float = spec.wear,

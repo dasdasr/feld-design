@@ -33,52 +33,65 @@ import com.feldelysium.designsystem.foundation.material.markerFilmMaterial
 import com.feldelysium.designsystem.theme.FeldTheme
 
 public enum class FeldIconId {
-    Back,
+    ArrowBack,
+    Chevron,
+    Close,
     Accept,
-    BackingCube,
-    BackingCircle,
-    More,
-    MoreHoriz,
-    Import,
-    Play,
+    Add,
+    FastAdd,
     Edit,
     Delete,
-    Add,
-    Close,
-    Chevron,
-    DialogueStyle,
-    Font,
-    Palette,
-    Reals,
-    FastAdd,
-    Tag,
-    Voice,
+    Save,
+    More,
+    MoreHoriz,
+    Search,
+    Undo,
+    Redo,
+    Copy,
+    Share,
+
+    Play,
+    Pause,
+    Stop,
+    Autoplay,
+    Speed,
+    Sound,
+    Mute,
+    Microphone,
+    Video,
     Image,
     Cinema,
     PlaybackText,
-    Settings,
-    Export,
+    Cassette,
+    Journal,
+
+    Import,
     BulkImport,
-    Video,
-    AuthorSamples,
-    Typeface,
-    Language,
-    Save,
-    Sound,
-    Microphone,
-    Autoplay,
-    Speed,
-    Panel,
-    PanelCalendar,
-    Calendar,
-    Time,
-    Heart,
+    Export,
     Paste,
-    Search,
+    Tag,
+    AuthorSamples,
+    DialogueStyle,
+    Typeface,
+    Palette,
+
+    Settings,
+    Options,
+    Language,
+    Calendar,
+    PanelCalendar,
+    Panel,
+    Time,
+
     Casino,
-    Oprions,
+    Reals,
+    Heart,
+    Map,
+    Location,
     RadioButtonChecked,
     RadioButtonUnchecked,
+    BackingCube,
+    BackingCircle,
 }
 
 /** Draws a [FeldIconId] icon, by default on a chalk film. */
@@ -94,53 +107,63 @@ public fun FeldIcon(
     film: Boolean = true,
 ) {
     @DrawableRes val res: Int = when (id) {
-        FeldIconId.Back -> R.drawable.feld_ic_back
+        FeldIconId.ArrowBack -> R.drawable.feld_ic_back
+        FeldIconId.Chevron -> R.drawable.feld_ic_chevron
+        FeldIconId.Close -> R.drawable.feld_ic_cancel
         FeldIconId.Accept -> R.drawable.feld_ic_accept
-        FeldIconId.BackingCube -> R.drawable.feld_ic_backing_cube
-        FeldIconId.BackingCircle -> R.drawable.feld_ic_backing_circle
-        FeldIconId.Import -> R.drawable.feld_ic_edit_import
-        FeldIconId.Play -> R.drawable.feld_ic_play
+        FeldIconId.Add -> R.drawable.feld_ic_add
+        FeldIconId.FastAdd -> R.drawable.feld_ic_fast_add
         FeldIconId.Edit -> R.drawable.feld_ic_edit
         FeldIconId.Delete -> R.drawable.feld_ic_trash
-        FeldIconId.Add -> R.drawable.feld_ic_add
-        FeldIconId.Tag -> R.drawable.feld_ic_tag
-        FeldIconId.AuthorSamples -> R.drawable.feld_ic_author_samples
-        FeldIconId.Close -> R.drawable.feld_ic_cancel
-        FeldIconId.Chevron -> R.drawable.feld_ic_chevron
-        FeldIconId.BulkImport -> R.drawable.feld_ic_bulk_import
-        FeldIconId.Typeface -> R.drawable.feld_ic_typeface
-        FeldIconId.Autoplay -> R.drawable.feld_ic_autoplay
-        FeldIconId.Font -> R.drawable.feld_ic_typeface
-        FeldIconId.Video -> R.drawable.feld_ic_video
-        FeldIconId.FastAdd -> R.drawable.feld_ic_fast_add
-        FeldIconId.Voice -> R.drawable.feld_ic_microphone
-        FeldIconId.Image -> R.drawable.feld_ic_image
-        FeldIconId.Cinema -> R.drawable.feld_ic_tape
-        FeldIconId.Settings -> R.drawable.feld_ic_settings
-        FeldIconId.Export -> R.drawable.feld_ic_export
         FeldIconId.Save -> R.drawable.feld_ic_save
-        FeldIconId.Sound -> R.drawable.feld_ic_sound
-        FeldIconId.Microphone -> R.drawable.feld_ic_microphone
         FeldIconId.More -> R.drawable.feld_ic_more
         FeldIconId.MoreHoriz -> R.drawable.feld_ic_more_horiz
-        FeldIconId.DialogueStyle -> R.drawable.feld_ic_dialog
-        FeldIconId.Palette -> R.drawable.feld_ic_palette
-        FeldIconId.PlaybackText -> R.drawable.feld_ic_playback_text
-        FeldIconId.Speed -> R.drawable.feld_ic_speed
-        FeldIconId.Panel -> R.drawable.feld_ic_panel
-        FeldIconId.PanelCalendar -> R.drawable.feld_ic_panel_calendar
-        FeldIconId.Heart -> R.drawable.feld_ic_heart
-        FeldIconId.Paste -> R.drawable.feld_ic_paste
         FeldIconId.Search -> R.drawable.feld_ic_search
+        FeldIconId.Undo -> R.drawable.feld_ic_undo
+        FeldIconId.Redo -> R.drawable.feld_ic_redo
+        FeldIconId.Copy -> R.drawable.feld_ic_copy
+        FeldIconId.Share -> R.drawable.feld_ic_share
+        FeldIconId.Play -> R.drawable.feld_ic_play
+        FeldIconId.Pause -> R.drawable.feld_ic_pause
+        FeldIconId.Stop -> R.drawable.feld_ic_stop
+        FeldIconId.Autoplay -> R.drawable.feld_ic_autoplay
+        FeldIconId.Speed -> R.drawable.feld_ic_speed
+        FeldIconId.Sound -> R.drawable.feld_ic_sound
+        FeldIconId.Mute -> R.drawable.feld_ic_mute
+        FeldIconId.Microphone -> R.drawable.feld_ic_microphone
+        FeldIconId.Video -> R.drawable.feld_ic_video
+        FeldIconId.Image -> R.drawable.feld_ic_image
+        FeldIconId.Cinema -> R.drawable.feld_ic_tape
+        FeldIconId.PlaybackText -> R.drawable.feld_ic_playback_text
+        FeldIconId.Cassette -> R.drawable.feld_ic_cassette
+        FeldIconId.Journal -> R.drawable.feld_ic_journal
+        FeldIconId.Import -> R.drawable.feld_ic_edit_import
+        FeldIconId.BulkImport -> R.drawable.feld_ic_bulk_import
+        FeldIconId.Export -> R.drawable.feld_ic_export
+        FeldIconId.Paste -> R.drawable.feld_ic_paste
+        FeldIconId.Tag -> R.drawable.feld_ic_tag
+        FeldIconId.AuthorSamples -> R.drawable.feld_ic_author_samples
+        FeldIconId.DialogueStyle -> R.drawable.feld_ic_dialog
+        FeldIconId.Typeface -> R.drawable.feld_ic_typeface
+        FeldIconId.Palette -> R.drawable.feld_ic_palette
+        FeldIconId.Settings -> R.drawable.feld_ic_settings
+        FeldIconId.Options -> R.drawable.feld_ic_options
+        FeldIconId.Language -> R.drawable.feld_ic_language
+        FeldIconId.Calendar -> R.drawable.feld_ic_calendar
+        FeldIconId.PanelCalendar -> R.drawable.feld_ic_panel_calendar
+        FeldIconId.Panel -> R.drawable.feld_ic_panel
+        FeldIconId.Time -> R.drawable.feld_ic_time
         FeldIconId.Casino -> R.drawable.feld_ic_dice_5
-        FeldIconId.Oprions -> R.drawable.feld_ic_options
+        FeldIconId.Reals -> R.drawable.feld_ic_real
+        FeldIconId.Heart -> R.drawable.feld_ic_heart
+        FeldIconId.Map -> R.drawable.feld_ic_map
+        FeldIconId.Location -> R.drawable.feld_ic_location
         FeldIconId.RadioButtonChecked -> R.drawable.feld_ic_radio_button_checked
         FeldIconId.RadioButtonUnchecked -> R.drawable.feld_ic_radio_button_unchecked
-        FeldIconId.Reals -> R.drawable.feld_ic_real
-        FeldIconId.Calendar -> R.drawable.feld_ic_calendar
-        FeldIconId.Time -> R.drawable.feld_ic_time
-        FeldIconId.Language -> R.drawable.feld_ic_language
+        FeldIconId.BackingCube -> R.drawable.feld_ic_backing_cube
+        FeldIconId.BackingCircle -> R.drawable.feld_ic_backing_circle
     }
+
     Icon(
         painter = painterResource(res),
         contentDescription = contentDescription,
@@ -162,7 +185,7 @@ public fun FeldIcon(
 }
 
 @Composable
-internal fun FlatDiamond(color: Color, modifier: Modifier = Modifier, size: Dp = 28.dp, outline: Boolean = false) {
+public fun FlatDiamond(color: Color, modifier: Modifier = Modifier, size: Dp = 28.dp, outline: Boolean = false) {
     Canvas(modifier.size(size)) {
         val w = this.size.width
         val h = this.size.height

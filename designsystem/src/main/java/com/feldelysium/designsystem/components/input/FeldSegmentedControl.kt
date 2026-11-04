@@ -141,8 +141,6 @@ public fun FeldSegmentedControl(
             .paperMaterial(trackShape, TrackPaper)
             .padding(3.dp),
     ) {
-        // Geometry: every segment has weight 1, the selected one 1 + SelectedGrow.
-        // The weights are interpolated by `position`, so the layout flows during the animation.
         val unit = maxWidth / (count + SELECTED_GROW)
         val sel = List(count) { selectedness(it, position) }
         val widths = List(count) { unit * (1f + SELECTED_GROW * sel[it]) }
@@ -172,7 +170,6 @@ public fun FeldSegmentedControl(
             )
         }
 
-        // The plate. The grain is fixed to the track, so the plate slides over it like a window.
         Box(
             Modifier
                 .fillMaxSize()
