@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.feldelysium.catalog.ui.AccentColors
 import com.feldelysium.catalog.ui.AccentNames
@@ -80,7 +81,16 @@ private val FeedbackSubjects = listOf(
                             FeldBadge(
                                 text = name,
                                 accent = BadgeColors[i],
-                                contentColor = if (i == 0) FeldPalette.Ink else androidx.compose.ui.graphics.Color.White,
+                                contentColor = if (i == 0) FeldPalette.Ink else Color.White,
+                                seed = i * 17 + 3,
+                                unit = 5f + i * 0.7f,
+                                rotation = when (i) {
+                                    0 -> -3f
+                                    1 -> 2f
+                                    2 -> -6f
+                                    3 -> 4f
+                                    else -> -1f
+                                },
                             )
                         }
                     }

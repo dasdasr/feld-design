@@ -30,6 +30,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -178,16 +180,6 @@ private fun Stage(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text("LIVE PREVIEW", style = CatalogMono, color = FeldPalette.Orange, modifier = Modifier.weight(1f))
-            if (textured) {
-                Text(
-                    "↻ NEW TEXTURE · $seed",
-                    style = CatalogMono,
-                    color = FeldPalette.Cream,
-                    modifier = Modifier
-                        .feldClickable(onClick = onReroll)
-                        .padding(horizontal = 20.dp, vertical = 14.dp),
-                )
-            }
             when {
                 action != null -> action()
 
@@ -234,17 +226,26 @@ private fun CodeTab(code: () -> String, notes: List<String>) {
 @Composable
 private fun CodeBlock(code: String) {
     val shape = RoundedCornerShape(4.dp)
+    val clipboard = LocalClipboardManager.current
+
     Box(
         Modifier
             .fillMaxWidth()
             .background(Color.White.copy(alpha = 0.05f), shape)
             .border(1.dp, Color.White.copy(alpha = 0.14f), shape)
             .horizontalScroll(rememberScrollState())
+            .feldClickable (onClick ={
+                clipboard.setText(AnnotatedString(code))
+            })
             .padding(16.dp),
     ) {
         Text(
             code,
-            style = CatalogMono.copy(fontSize = 12.sp, lineHeight = 18.sp, letterSpacing = 0.sp),
+            style = CatalogMono.copy(
+                fontSize = 12.sp,
+                lineHeight = 18.sp,
+                letterSpacing = 0.sp,
+            ),
             color = FeldPalette.Cream,
             softWrap = false,
         )
